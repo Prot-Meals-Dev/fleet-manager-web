@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600&display=swap');
+
+.container-fluid {
+    height: 100vh;
+    background-image: url('../../../../public/login/login.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login {
+    background-color: white;
+    padding: 1.2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+    height: 30rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.headings {
+    font-weight: 400;
+}
+
+.login form {
+    font-weight: 500;
+}
+
+.login button {
+    margin-top: 2rem;
+    max-width: 350px;
+    display: block;
+}
+
+.forgot-password {
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 300;
+    color: #202224;
+    opacity: 0.6;
+    text-decoration: none;
+    font-size: 0.875rem;
+    /* optional for better sizing */
+}
