@@ -90,3 +90,8 @@
 .offcanvas-body .nav-link i {
     font-size: 1.1rem;
 }
+
+.offcanvas-body .nav-link.active {
+  background-color: #C0272D;
+  color: #fff;
+}
