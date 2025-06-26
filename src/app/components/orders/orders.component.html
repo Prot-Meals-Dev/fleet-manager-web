@@ -1,1 +1,45 @@
-<p>orders works!</p>
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="m-0">Orders</h2>
+    <button class="btn custom-btn">Create Order</button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table custom-table align-middle text-center table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Start Date</th>
+          <th>Delivery Partner</th>
+          <th>Payment Status</th>
+          <th>Status</th>
+          <th>Edit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td>{{ order.id }}</td>
+          <td>{{ order.name }}</td>
+          <td>{{ order.address }}</td>
+          <td>{{ order.startDate }}</td>
+          <td>{{ order.deliveryPartner }}</td>
+          <td>
+            <span class="badge px-3 py-2"
+              [ngClass]="order.paymentStatus === 'Paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
+              {{ order.paymentStatus }}
+            </span>
+          </td>
+          <td>
+            <span class="badge px-3 py-2"
+              [ngClass]="order.completed ? 'bg-primary-subtle text-primary' : 'bg-secondary-subtle text-secondary'">
+              {{ order.completed ? 'Completed' : 'Pending' }}
+            </span>
+          </td>
+          <td><i class="bi bi-pencil-square" role="button"></i></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
