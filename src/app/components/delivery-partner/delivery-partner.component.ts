@@ -1,11 +1,37 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-delivery-partner',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './delivery-partner.component.html',
   styleUrl: './delivery-partner.component.css'
 })
 export class DeliveryPartnerComponent {
-
+  deliveryPartners = [
+    {
+      id: 101,
+      name: 'Ravi Kumar',
+      email: 'ravi@example.com',
+      phone: '9876543210',
+      ordersAssigned: 25,
+      isActive: true
+    },
+    {
+      id: 102,
+      name: 'Anjali Singh',
+      email: 'anjali@example.com',
+      phone: '8765432109',
+      ordersAssigned: 12,
+      isActive: false
+    },
+    {
+      id: 103,
+      name: 'Amit Sharma',
+      email: 'amit@example.com',
+      phone: '9123456780',
+      ordersAssigned: 8,
+      isActive: true
+    }
+  ];
 }

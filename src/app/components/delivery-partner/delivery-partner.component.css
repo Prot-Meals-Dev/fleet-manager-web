@@ -1,0 +1,32 @@
+.custom-btn {
+    border: 1px solid #C0272D;
+    color: #C0272D;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+}
+
+.custom-btn:hover {
+    background-color: #C0272D;
+    color: white;
+}
+
+i.bi-pencil-square {
+    color: #C0272D;
+}
+
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.custom-table th,
+.custom-table td {
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+.custom-table tbody tr {
+    transition: background-color 0.3s ease;
+}
