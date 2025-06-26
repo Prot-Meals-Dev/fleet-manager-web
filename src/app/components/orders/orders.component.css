@@ -5,6 +5,15 @@
     transition: background-color 0.3s ease;
 }
 
+.filter-group {
+    background-color: #f8f9fa;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+}
+
 .custom-btn:hover {
     background-color: #C0272D;
     color: white;

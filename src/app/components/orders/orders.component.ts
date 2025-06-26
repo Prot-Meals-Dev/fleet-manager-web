@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-orders',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.css'
 })
@@ -37,4 +39,18 @@ export class OrdersComponent {
       completed: false
     }
   ];
+
+  filters = {
+    startDate: '',
+    paymentStatus: '',
+    orderStatus: ''
+  };
+
+  resetFilters() {
+    this.filters = {
+      startDate: '',
+      paymentStatus: '',
+      orderStatus: ''
+    };
+  }
 }

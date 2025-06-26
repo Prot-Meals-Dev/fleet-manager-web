@@ -1,45 +1,78 @@
 <div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="m-0">Orders</h2>
-    <button class="btn custom-btn">Create Order</button>
-  </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="m-0">Orders</h2>
+        <button class="btn custom-btn">Create Order</button>
+    </div>
 
-  <div class="table-responsive">
-    <table class="table custom-table align-middle text-center table-hover">
-      <thead class="table-light">
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Address</th>
-          <th>Start Date</th>
-          <th>Delivery Partner</th>
-          <th>Payment Status</th>
-          <th>Status</th>
-          <th>Edit</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let order of orders">
-          <td>{{ order.id }}</td>
-          <td>{{ order.name }}</td>
-          <td>{{ order.address }}</td>
-          <td>{{ order.startDate }}</td>
-          <td>{{ order.deliveryPartner }}</td>
-          <td>
-            <span class="badge px-3 py-2"
-              [ngClass]="order.paymentStatus === 'Paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
-              {{ order.paymentStatus }}
-            </span>
-          </td>
-          <td>
-            <span class="badge px-3 py-2"
-              [ngClass]="order.completed ? 'bg-primary-subtle text-primary' : 'bg-secondary-subtle text-secondary'">
-              {{ order.completed ? 'Completed' : 'Pending' }}
-            </span>
-          </td>
-          <td><i class="bi bi-pencil-square" role="button"></i></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <div class="filter-group d-inline-flex flex-wrap border rounded overflow-hidden mb-3">
+        <div class="filter-item d-flex align-items-center gap-2 px-3 py-2 border-end">
+            <i class="bi bi-funnel-fill fs-5"></i>
+            <span class="fw-semibold">Filter By</span>
+        </div>
+
+        <div class="filter-item border-end">
+            <input type="date" class="form-control border-0 h-100 rounded-0" [(ngModel)]="filters.startDate">
+        </div>
+
+        <div class="filter-item border-end">
+            <select class="form-select border-0 h-100 rounded-0" [(ngModel)]="filters.paymentStatus">
+                <option value="">Payment Status</option>
+                <option value="Paid">Paid</option>
+                <option value="Unpaid">Unpaid</option>
+            </select>
+        </div>
+
+        <div class="filter-item border-end">
+            <select class="form-select border-0 h-100 rounded-0" [(ngModel)]="filters.orderStatus">
+                <option value="">Order Status</option>
+                <option value="Completed">Completed</option>
+                <option value="Pending">Pending</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <button class="btn btn-link text-danger text-decoration-none px-3 py-2" (click)="resetFilters()">
+                <i class="bi bi-arrow-clockwise me-1"></i> Reset Filter
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table custom-table align-middle text-center table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Start Date</th>
+                    <th>Delivery Partner</th>
+                    <th>Payment Status</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let order of orders">
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.name }}</td>
+                    <td>{{ order.address }}</td>
+                    <td>{{ order.startDate }}</td>
+                    <td>{{ order.deliveryPartner }}</td>
+                    <td>
+                        <span class="badge px-3 py-2"
+                            [ngClass]="order.paymentStatus === 'Paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
+                            {{ order.paymentStatus }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge px-3 py-2"
+                            [ngClass]="order.completed ? 'bg-primary-subtle text-primary' : 'bg-secondary-subtle text-secondary'">
+                            {{ order.completed ? 'Completed' : 'Pending' }}
+                        </span>
+                    </td>
+                    <td><i class="bi bi-pencil-square" role="button"></i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
