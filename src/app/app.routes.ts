@@ -19,7 +19,8 @@ export const routes: Routes = [
             { path: 'deliverypartner', loadComponent: loadDeliveryPartnerComponent },
             { path: 'deliverypartnerdetail', loadComponent: loadDeliveryPartnerDetailComponent },
             { path: 'orders', loadComponent: loadOrdersComponent },
-            { path: '**', loadComponent: loadNotFoundComopnent }
+            // { path: '**', loadComponent: loadNotFoundComopnent }
         ]
-    }
+    },
+    { path: '**', loadComponent: loadNotFoundComopnent }
 ];
