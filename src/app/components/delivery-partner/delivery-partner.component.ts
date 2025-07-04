@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ConfirmationService } from '../../shared/components/confirmation-modal/service/confirmation.service';
+import { AlertService } from '../../shared/components/alert/service/alert.service';
 
 @Component({
   selector: 'app-delivery-partner',
@@ -37,14 +38,21 @@ export class DeliveryPartnerComponent {
   ];
 
   constructor(
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private alertService: AlertService
   ) { }
 
   async deleteItem() {
+    this.alertService.showAlert({
+      message: 'Plan updated successfully',
+      type: 'success',
+      autoDismiss: true,
+      duration: 4000
+    });
     const confirmed = await this.confirmationService.confirm('Do you really want to delete this item?');
     if (confirmed) {
       // proceed with deletion
     }
   }
-  
+
 }
