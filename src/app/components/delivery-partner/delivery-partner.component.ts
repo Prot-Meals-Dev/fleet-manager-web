@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { ConfirmationService } from '../../shared/components/confirmation-modal/service/confirmation.service';
 
 @Component({
   selector: 'app-delivery-partner',
@@ -34,4 +35,16 @@ export class DeliveryPartnerComponent {
       isActive: true
     }
   ];
+
+  constructor(
+    private confirmationService: ConfirmationService
+  ) { }
+
+  async deleteItem() {
+    const confirmed = await this.confirmationService.confirm('Do you really want to delete this item?');
+    if (confirmed) {
+      // proceed with deletion
+    }
+  }
+  
 }
