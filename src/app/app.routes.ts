@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { LayoutComponent } from './layout/layout.component';
-
-const loadDashboardComponent = () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent);
-const loadDeliveryPartnerComponent = () => import('./components/delivery-partner/delivery-partner.component').then(m => m.DeliveryPartnerComponent);
-const loadDeliveryPartnerDetailComponent = () => import('./components/delivery-partner-detail/delivery-partner-detail.component').then(m => m.DeliveryPartnerDetailComponent);
-const loadOrdersComponent = () => import('./components/orders/orders.component').then(m => m.OrdersComponent);
-const loadNotFoundComopnent = () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent);
+import { authGuard } from './core/guard/auth.guard';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { DeliveryPartnerComponent } from './components/delivery-partner/delivery-partner.component';
+import { DeliveryPartnerDetailComponent } from './components/delivery-partner-detail/delivery-partner-detail.component';
+import { OrdersComponent } from './components/orders/orders.component';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -14,13 +14,14 @@ export const routes: Routes = [
     {
         path: '',
         component: LayoutComponent,
+        canActivate: [authGuard],
         children: [
-            { path: 'dashboard', loadComponent: loadDashboardComponent },
-            { path: 'deliverypartner', loadComponent: loadDeliveryPartnerComponent },
-            { path: 'deliverypartnerdetail', loadComponent: loadDeliveryPartnerDetailComponent },
-            { path: 'orders', loadComponent: loadOrdersComponent },
+            { path: 'dashboard', component: DashboardComponent },
+            { path: 'deliverypartner', component: DeliveryPartnerComponent },
+            { path: 'deliverypartnerdetail', component: DeliveryPartnerDetailComponent },
+            { path: 'orders', component: OrdersComponent },
             // { path: '**', loadComponent: loadNotFoundComopnent }
         ]
     },
-    { path: '**', loadComponent: loadNotFoundComopnent }
+    { path: '**', component: NotFoundComponent }
 ];
