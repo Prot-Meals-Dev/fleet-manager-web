@@ -15,6 +15,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class DeliveryPartnerComponent implements OnInit {
   allPartners!: any[];
   partnerForm: FormGroup;
+  isLoading = false;
 
   constructor(
     private confirmationService: ConfirmationService,
@@ -35,9 +36,11 @@ export class DeliveryPartnerComponent implements OnInit {
   }
 
   loadAllPartners() {
+    this.isLoading = true;
     this.service.getPartnerList().subscribe({
       next: (res: any) => {
-        this.allPartners = res.data || []
+        this.allPartners = res.data || [];
+        this.isLoading = false;
       },
       error: (err) => {
         console.error(err);
@@ -47,6 +50,7 @@ export class DeliveryPartnerComponent implements OnInit {
           autoDismiss: true,
           duration: 4000
         });
+        this.isLoading = false;
       }
     })
   }

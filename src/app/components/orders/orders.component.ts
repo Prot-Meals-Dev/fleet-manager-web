@@ -27,6 +27,7 @@ export class OrdersComponent implements OnInit {
   days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   payableAmount: number = 0;
   minDate: NgbDateStruct;
+  isLoading = false;
 
   constructor(
     private service: OrdersService,
@@ -70,9 +71,11 @@ export class OrdersComponent implements OnInit {
   }
 
   loadOrderList() {
+    this.isLoading = true;
     this.service.getOrdersList().subscribe({
       next: (res: any) => {
-        this.orderList = res.data || []
+        this.orderList = res.data || [];
+        this.isLoading = false;
       },
       error: (err) => {
         console.error(err);
@@ -82,6 +85,7 @@ export class OrdersComponent implements OnInit {
           autoDismiss: true,
           duration: 4000
         });
+        this.isLoading = false;
       }
     })
   }

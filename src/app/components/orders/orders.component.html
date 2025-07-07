@@ -37,7 +37,18 @@
         </div>
     </div>
 
-    <div class="table-responsive">
+    <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center my-4">
+        <div class="spinner-border text-danger" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && orderList.length === 0" class="text-center text-muted my-5">
+        <i class="bi bi-box fs-1 mb-3 d-block"></i>
+        <p class="fs-5">No orders found.</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="!isLoading && orderList.length > 0">
         <table class="table custom-table align-middle text-center table-hover">
             <thead class="table-light">
                 <tr>
@@ -143,7 +154,8 @@
                         <div class="col">
                             <label>Start Date</label>
                             <input class="form-control" placeholder="yyyy-mm-dd" formControlName="startDate"
-                                ngbDatepicker [minDate]="minDate" #startDp="ngbDatepicker" (click)="startDp.toggle()" readonly>
+                                ngbDatepicker [minDate]="minDate" #startDp="ngbDatepicker" (click)="startDp.toggle()"
+                                readonly>
                         </div>
                         <div class="col">
                             <label>End Date</label>
