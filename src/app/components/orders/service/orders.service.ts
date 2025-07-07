@@ -25,4 +25,8 @@ export class OrdersService {
   getMealTypes(){
     return this.http.get(`${this.mealTypeUrl}`)
   }
+
+  getOrderByID(id: string | null){
+    return this.http.get(`${this.BaseUrl}/${id}`)
+  }
 }

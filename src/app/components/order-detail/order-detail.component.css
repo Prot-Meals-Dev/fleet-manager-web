@@ -1,0 +1,76 @@
+.detail-container {
+    background-color: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: max-content 1ch auto;
+    row-gap: 0.4rem;
+    column-gap: 1rem;
+    max-width: 600px;
+}
+
+.detail-label {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.detail-colon {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.detail-value {
+    text-align: left;
+    word-break: break-word;
+}
+
+.detail-border {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid #ddd;
+    margin: 0.3rem 0;
+}
+
+.detail-gap {
+    grid-column: 1 / -1;
+    height: 1rem;
+}
+
+button.btn-danger {
+    background-color: #b30000;
+    border: none;
+}
+
+button.btn-danger:hover {
+    background-color: #990000;
+}
+
+/* Responsive: Stack labels and values vertically on small screens */
+@media (max-width: 576px) {
+    .detail-row {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-label,
+    .detail-colon,
+    .detail-value {
+        display: inline;
+    }
+
+    .detail-label::after {
+        content: ": ";
+    }
+
+    .detail-colon {
+        display: none;
+    }
+
+    .detail-border {
+        margin-top: 0.5rem;
+    }
+}

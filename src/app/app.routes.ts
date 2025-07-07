@@ -7,6 +7,7 @@ import { DeliveryPartnerComponent } from './components/delivery-partner/delivery
 import { DeliveryPartnerDetailComponent } from './components/delivery-partner-detail/delivery-partner-detail.component';
 import { OrdersComponent } from './components/orders/orders.component';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+import { OrderDetailComponent } from './components/order-detail/order-detail.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -20,6 +21,8 @@ export const routes: Routes = [
             { path: 'deliverypartner', component: DeliveryPartnerComponent },
             { path: 'deliverypartnerdetail', component: DeliveryPartnerDetailComponent },
             { path: 'orders', component: OrdersComponent },
+            { path: 'deliverypartnerdetail/:id', component: DeliveryPartnerDetailComponent },
+            { path: 'orderdetail/:id', component: OrderDetailComponent }
             // { path: '**', loadComponent: loadNotFoundComopnent }
         ]
     },

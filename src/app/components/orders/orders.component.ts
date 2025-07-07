@@ -5,6 +5,7 @@ import { OrdersService } from './service/orders.service';
 import { NgbCalendar, NgbDatepickerModule, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../shared/components/alert/service/alert.service';
 import { DeliveryPartnerService } from '../delivery-partner/service/delivery-partner.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -33,7 +34,8 @@ export class OrdersComponent implements OnInit {
     private fb: FormBuilder,
     private alertService: AlertService,
     private partnerService: DeliveryPartnerService,
-    private calendar: NgbCalendar
+    private calendar: NgbCalendar,
+    private router: Router
   ) {
     this.minDate = this.calendar.getToday();
   }
@@ -262,5 +264,9 @@ export class OrdersComponent implements OnInit {
     if (!dateStruct) return '';
     const pad = (n: number) => (n < 10 ? '0' + n : n);
     return `${dateStruct.year}-${pad(dateStruct.month)}-${pad(dateStruct.day)}`;
+  }
+
+  goToOrderDetail(orderId: string) {
+    this.router.navigate(['/orderdetail', orderId]);
   }
 }
