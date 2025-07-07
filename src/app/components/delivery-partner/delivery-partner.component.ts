@@ -16,6 +16,8 @@ export class DeliveryPartnerComponent implements OnInit {
   allPartners!: any[];
   partnerForm: FormGroup;
   isLoading = false;
+  editMode = false;
+  selectedPartnerId: string | null = null;
 
   constructor(
     private confirmationService: ConfirmationService,
@@ -55,8 +57,18 @@ export class DeliveryPartnerComponent implements OnInit {
     })
   }
 
-  openCreateModal(content: any) {
+  openCreateModal(content: any, partner?: any) {
     this.partnerForm.reset();
+    this.editMode = !!partner;
+    this.selectedPartnerId = partner?.id || null;
+
+    if (partner) {
+      this.partnerForm.patchValue({
+        name: partner.name,
+        email: partner.email,
+        phone: partner.phone
+      });
+    }
 
     const buttonElement = document.activeElement as HTMLElement
     buttonElement.blur();
@@ -68,25 +80,49 @@ export class DeliveryPartnerComponent implements OnInit {
     if (this.partnerForm.valid) {
       const formData = this.partnerForm.value;
 
-      this.service.createPartner(formData).subscribe({
-        next: (res) => {
-          this.alertService.showAlert({
-            message: 'Partner Created successfully',
-            type: 'success',
-            autoDismiss: true,
-            duration: 4000
-          });
-        },
-        error: (err) => {
-          console.error(err);
-          this.alertService.showAlert({
-            message: err.error.message,
-            type: 'error',
-            autoDismiss: true,
-            duration: 4000
-          });
-        }
-      })
+      if (this.editMode && this.selectedPartnerId) {
+        this.service.updatePartner(this.selectedPartnerId, formData).subscribe({
+          next: () => {
+            this.alertService.showAlert({
+              message: 'Partner updated successfully',
+              type: 'success',
+              autoDismiss: true,
+              duration: 4000
+            });
+            this.loadAllPartners();
+          },
+          error: (err) => {
+            console.error(err);
+            this.alertService.showAlert({
+              message: err.error.message || 'Update failed',
+              type: 'error',
+              autoDismiss: true,
+              duration: 4000
+            });
+          }
+        });
+      } else {
+        this.service.createPartner(formData).subscribe({
+          next: () => {
+            this.alertService.showAlert({
+              message: 'Partner created successfully',
+              type: 'success',
+              autoDismiss: true,
+              duration: 4000
+            });
+            this.loadAllPartners();
+          },
+          error: (err) => {
+            console.error(err);
+            this.alertService.showAlert({
+              message: err.error.message || 'Creation failed',
+              type: 'error',
+              autoDismiss: true,
+              duration: 4000
+            });
+          }
+        });
+      }
 
       modal.close();
     }

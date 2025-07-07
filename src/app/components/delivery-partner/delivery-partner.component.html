@@ -12,7 +12,7 @@
 
     <div *ngIf="!isLoading && allPartners.length === 0" class="text-center text-muted my-5">
         <i class="bi bi-box fs-1 mb-3 d-block"></i>
-        <p class="fs-5">No orders found.</p>
+        <p class="fs-5">No partners found.</p>
     </div>
 
     <div class="table-responsive" *ngIf="!isLoading && allPartners.length > 0">
@@ -41,7 +41,7 @@
                             {{ partner.status ? 'Active' : 'Inactive' }}
                         </span>
                     </td>
-                    <td><i class="bi bi-pencil-square" role="button"></i></td>
+                    <td (click)="openCreateModal(createPartnerModal, partner)"><i class="bi bi-pencil-square" role="button"></i></td>
                 </tr>
             </tbody>
         </table>
@@ -50,7 +50,7 @@
 
 <ng-template #createPartnerModal let-modal>
     <div class="modal-header">
-        <h5 class="modal-title">Create Delivery Partner</h5>
+        <h5 class="modal-title">{{ editMode ? 'Edit Delivery Partner' : 'Create Delivery Partner' }}</h5>
         <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
     </div>
 
@@ -72,7 +72,9 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
-            <button type="submit" class="btn btn-primary" [disabled]="partnerForm.invalid">Create</button>
+            <button type="submit" class="btn btn-primary" [disabled]="partnerForm.invalid">
+                {{ editMode ? 'Update' : 'Create' }}
+            </button>
         </div>
     </form>
 </ng-template>

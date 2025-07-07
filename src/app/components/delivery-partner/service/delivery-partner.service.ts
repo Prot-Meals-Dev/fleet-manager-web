@@ -8,6 +8,8 @@ import { HttpClient } from '@angular/common/http';
 export class DeliveryPartnerService {
   private BaseUrl = `${environment.apiUrl}/fleet-manager/create-partner`
   private BaseUrl1 = `${environment.apiUrl}/users/delivery-partner`
+  private UpdateUrl = `${environment.apiUrl}/fleet-manager/update-partner`
+
 
   constructor(
     private http: HttpClient
@@ -19,5 +21,9 @@ export class DeliveryPartnerService {
 
   getPartnerList() {
     return this.http.get(`${this.BaseUrl1}`)
+  }
+
+  updatePartner(id: string, itm: any) {
+    return this.http.patch(`${this.UpdateUrl}/${id}`, itm)
   }
 }
