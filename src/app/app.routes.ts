@@ -19,7 +19,6 @@ export const routes: Routes = [
         children: [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'deliverypartner', component: DeliveryPartnerComponent },
-            { path: 'deliverypartnerdetail', component: DeliveryPartnerDetailComponent },
             { path: 'orders', component: OrdersComponent },
             { path: 'deliverypartnerdetail/:id', component: DeliveryPartnerDetailComponent },
             { path: 'orderdetail/:id', component: OrderDetailComponent }

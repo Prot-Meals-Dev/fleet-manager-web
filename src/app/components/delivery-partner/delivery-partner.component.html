@@ -30,12 +30,12 @@
             </thead>
             <tbody>
                 <tr *ngFor="let partner of allPartners">
-                    <td>{{ partner.id }}</td>
-                    <td>{{ partner.name }}</td>
-                    <td>{{ partner.email }}</td>
-                    <td>{{ partner.phone || 'N/A' }}</td>
-                    <td>{{ partner.created_at | date: 'dd-MM-yyyy'}}</td>
-                    <td>
+                    <td (click)="goToPartnerDetail(partner.id)">{{ partner.id }}</td>
+                    <td (click)="goToPartnerDetail(partner.id)">{{ partner.name }}</td>
+                    <td (click)="goToPartnerDetail(partner.id)">{{ partner.email }}</td>
+                    <td (click)="goToPartnerDetail(partner.id)">{{ partner.phone || 'N/A' }}</td>
+                    <td (click)="goToPartnerDetail(partner.id)">{{ partner.created_at | date: 'dd-MM-yyyy'}}</td>
+                    <td (click)="goToPartnerDetail(partner.id)">
                         <span class="badge px-3 py-2"
                             [ngClass]="partner.status ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'">
                             {{ partner.status ? 'Active' : 'Inactive' }}

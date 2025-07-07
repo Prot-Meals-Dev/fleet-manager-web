@@ -9,6 +9,7 @@ export class DeliveryPartnerService {
   private BaseUrl = `${environment.apiUrl}/fleet-manager/create-partner`
   private BaseUrl1 = `${environment.apiUrl}/users/delivery-partner`
   private UpdateUrl = `${environment.apiUrl}/fleet-manager/update-partner`
+  private GetUserUrl = `${environment.apiUrl}/users`
 
 
   constructor(
@@ -25,5 +26,9 @@ export class DeliveryPartnerService {
 
   updatePartner(id: string, itm: any) {
     return this.http.patch(`${this.UpdateUrl}/${id}`, itm)
+  }
+
+  getPartner(id: string | null){
+    return this.http.get(`${this.GetUserUrl}/${id}`)
   }
 }

@@ -5,6 +5,7 @@ import { AlertService } from '../../shared/components/alert/service/alert.servic
 import { DeliveryPartnerService } from './service/delivery-partner.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-delivery-partner',
@@ -24,7 +25,8 @@ export class DeliveryPartnerComponent implements OnInit {
     private alertService: AlertService,
     private service: DeliveryPartnerService,
     private fb: FormBuilder,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private router: Router
   ) {
     this.partnerForm = this.fb.group({
       name: ['', Validators.required],
@@ -139,6 +141,10 @@ export class DeliveryPartnerComponent implements OnInit {
     if (confirmed) {
       // proceed with deletion
     }
+  }
+
+  goToPartnerDetail(orderId: string) {
+    this.router.navigate(['/deliverypartnerdetail', orderId]);
   }
 
 }
