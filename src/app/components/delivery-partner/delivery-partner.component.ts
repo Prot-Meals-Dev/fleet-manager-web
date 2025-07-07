@@ -1,46 +1,93 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ConfirmationService } from '../../shared/components/confirmation-modal/service/confirmation.service';
 import { AlertService } from '../../shared/components/alert/service/alert.service';
+import { DeliveryPartnerService } from './service/delivery-partner.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-delivery-partner',
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './delivery-partner.component.html',
   styleUrl: './delivery-partner.component.css'
 })
-export class DeliveryPartnerComponent {
-  deliveryPartners = [
-    {
-      id: 101,
-      name: 'Ravi Kumar',
-      email: 'ravi@example.com',
-      phone: '9876543210',
-      ordersAssigned: 25,
-      isActive: true
-    },
-    {
-      id: 102,
-      name: 'Anjali Singh',
-      email: 'anjali@example.com',
-      phone: '8765432109',
-      ordersAssigned: 12,
-      isActive: false
-    },
-    {
-      id: 103,
-      name: 'Amit Sharma',
-      email: 'amit@example.com',
-      phone: '9123456780',
-      ordersAssigned: 8,
-      isActive: true
-    }
-  ];
+export class DeliveryPartnerComponent implements OnInit {
+  allPartners!: any[];
+  partnerForm: FormGroup;
 
   constructor(
     private confirmationService: ConfirmationService,
-    private alertService: AlertService
-  ) { }
+    private alertService: AlertService,
+    private service: DeliveryPartnerService,
+    private fb: FormBuilder,
+    private modalService: NgbModal
+  ) {
+    this.partnerForm = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', Validators.required]
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadAllPartners()
+  }
+
+  loadAllPartners() {
+    this.service.getPartnerList().subscribe({
+      next: (res: any) => {
+        this.allPartners = res.data || []
+      },
+      error: (err) => {
+        console.log(err);
+        this.alertService.showAlert({
+          message: 'Partners not loaded. Try Again',
+          type: 'error',
+          autoDismiss: true,
+          duration: 4000
+        });
+      }
+    })
+  }
+
+  openCreateModal(content: any) {
+    this.partnerForm.reset();
+
+    const buttonElement = document.activeElement as HTMLElement
+    buttonElement.blur();
+
+    this.modalService.open(content, { centered: true });
+  }
+
+  onSubmit(modal: any) {
+    if (this.partnerForm.valid) {
+      const formData = this.partnerForm.value;
+      console.log('Submitted:', formData);
+
+      this.service.createPartner(formData).subscribe({
+        next: (res) => {
+          this.alertService.showAlert({
+            message: 'Partner Created successfully',
+            type: 'success',
+            autoDismiss: true,
+            duration: 4000
+          });
+        },
+        error: (err) => {
+          console.log(err);
+          this.alertService.showAlert({
+            message: err.error.message,
+            type: 'error',
+            autoDismiss: true,
+            duration: 4000
+          });
+        }
+      })
+
+      modal.close();
+    }
+  }
 
   async deleteItem() {
     this.alertService.showAlert({

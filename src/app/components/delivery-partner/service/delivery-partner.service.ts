@@ -6,13 +6,18 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class DeliveryPartnerService {
-  private BaseUrl = `${environment.apiUrl}`
+  private BaseUrl = `${environment.apiUrl}/fleet-manager/create-partner`
+  private BaseUrl1 = `${environment.apiUrl}/users/delivery-partner`
 
   constructor(
     private http: HttpClient
   ) { }
 
-  // createPartner(itm: any) {
-  //   return this.http
-  // }
+  createPartner(itm: any) {
+    return this.http.post(`${this.BaseUrl}`, itm)
+  }
+
+  getPartnerList() {
+    return this.http.get(`${this.BaseUrl1}`)
+  }
 }
