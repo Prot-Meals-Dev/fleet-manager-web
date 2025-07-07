@@ -40,7 +40,7 @@ export class DeliveryPartnerComponent implements OnInit {
         this.allPartners = res.data || []
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
         this.alertService.showAlert({
           message: 'Partners not loaded. Try Again',
           type: 'error',
@@ -63,7 +63,6 @@ export class DeliveryPartnerComponent implements OnInit {
   onSubmit(modal: any) {
     if (this.partnerForm.valid) {
       const formData = this.partnerForm.value;
-      console.log('Submitted:', formData);
 
       this.service.createPartner(formData).subscribe({
         next: (res) => {
@@ -75,7 +74,7 @@ export class DeliveryPartnerComponent implements OnInit {
           });
         },
         error: (err) => {
-          console.log(err);
+          console.error(err);
           this.alertService.showAlert({
             message: err.error.message,
             type: 'error',

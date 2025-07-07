@@ -21,11 +21,10 @@ export class DashboardComponent implements OnInit {
   loadData() {
     this.service.getAnalytics().subscribe({
       next: (res:any) => {
-        console.log(res);
         this.allData = res.data || {}
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     })
   }
