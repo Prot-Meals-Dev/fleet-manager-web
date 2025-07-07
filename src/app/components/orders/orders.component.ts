@@ -2,8 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OrdersService } from './service/orders.service';
-import { NgbDatepickerModule, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCalendar, NgbDatepickerModule, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../shared/components/alert/service/alert.service';
+import { DeliveryPartnerService } from '../delivery-partner/service/delivery-partner.service';
 
 
 @Component({
@@ -13,36 +14,6 @@ import { AlertService } from '../../shared/components/alert/service/alert.servic
   styleUrl: './orders.component.css'
 })
 export class OrdersComponent implements OnInit {
-  orders = [
-    {
-      id: 201,
-      name: 'John Doe',
-      address: '123 Main Street, Mumbai',
-      startDate: '2025-06-20',
-      deliveryPartner: 'Ravi Kumar',
-      paymentStatus: 'Paid',
-      completed: true
-    },
-    {
-      id: 202,
-      name: 'Jane Smith',
-      address: '456 Lake View, Delhi',
-      startDate: '2025-06-21',
-      deliveryPartner: 'Anjali Singh',
-      paymentStatus: 'Unpaid',
-      completed: false
-    },
-    {
-      id: 203,
-      name: 'David Johnson',
-      address: '789 Hilltop Rd, Bangalore',
-      startDate: '2025-06-22',
-      deliveryPartner: 'Amit Sharma',
-      paymentStatus: 'Paid',
-      completed: false
-    }
-  ];
-
   filters = {
     startDate: '',
     paymentStatus: '',
@@ -50,16 +21,22 @@ export class OrdersComponent implements OnInit {
   };
   orderForm!: FormGroup;
   orderList!: any[]
-  deliveryPartners = ['Ravi Kumar', 'Anjali Singh', 'Amit Sharma'];
+  deliveryPartners!: any[];
+  mealTypes!: any[];
   days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   payableAmount: number = 0;
+  minDate: NgbDateStruct;
 
   constructor(
     private service: OrdersService,
     private modalService: NgbModal,
     private fb: FormBuilder,
-    private alertService: AlertService
-  ) { }
+    private alertService: AlertService,
+    private partnerService: DeliveryPartnerService,
+    private calendar: NgbCalendar
+  ) {
+    this.minDate = this.calendar.getToday();
+  }
 
   ngOnInit(): void {
     this.loadOrderList()
@@ -69,52 +46,117 @@ export class OrdersComponent implements OnInit {
   initForm() {
     this.orderForm = this.fb.group({
       customerName: [''],
-      email: [''], // 👈 Add this line
-      contactNumber: [''],
       customerAddress: [''],
-      gpsLocation: [''],
       deliveryAddress: [''],
-      sameAsCustomer: [false],
+      contactNumber: [''],
+      email: [''],
+      mealTypeId: [''],
       startDate: [null],
       endDate: [null],
-      foodOption: [[]],
       recurringDays: [[]],
-      deliveryPartner: ['']
+      deliveryPartner: [''],
+      mealPreferences: this.fb.group({
+        breakfast: [false],
+        lunch: [false],
+        dinner: [false]
+      })
     });
 
-    this.orderForm.get('sameAsCustomer')?.valueChanges.subscribe(checked => {
-      if (checked) {
-        this.orderForm.patchValue({
-          deliveryAddress: this.orderForm.value.customerAddress
-        });
-      }
-    });
+    this.orderForm.get('mealTypeId')?.valueChanges.subscribe(() => this.calculatePayableAmount());
+    this.orderForm.get('startDate')?.valueChanges.subscribe(() => this.calculatePayableAmount());
+    this.orderForm.get('endDate')?.valueChanges.subscribe(() => this.calculatePayableAmount());
   }
 
   loadOrderList() {
     this.service.getOrdersList().subscribe({
-      next: (res) => {
-        console.log(res);
+      next: (res: any) => {
+        this.orderList = res.data || []
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
+        this.alertService.showAlert({
+          message: err.error.message,
+          type: 'error',
+          autoDismiss: true,
+          duration: 4000
+        });
       }
     })
   }
 
   toggleFoodOption(option: string) {
-    const selected = this.orderForm.value.foodOption as string[];
-    if (selected.includes(option)) {
-      this.orderForm.patchValue({
-        foodOption: selected.filter(o => o !== option)
-      });
-    } else {
-      this.orderForm.patchValue({
-        foodOption: [...selected, option]
-      });
+    const mealPreferences = this.orderForm.get('mealPreferences');
+    if (mealPreferences) {
+      const current = mealPreferences.get(option.toLowerCase());
+      if (current) {
+        current.setValue(!current.value);
+        this.calculatePayableAmount();
+      }
     }
   }
 
+  calculatePayableAmount() {
+    const value = this.orderForm.value;
+    const mealType = this.mealTypes.find(type => type.id === value.mealTypeId);
+    const preferences = value.mealPreferences;
+
+    if (!mealType || !value.startDate || !value.endDate) {
+      this.payableAmount = 0;
+      return;
+    }
+
+    const start = new Date(value.startDate.year, value.startDate.month - 1, value.startDate.day);
+    const end = new Date(value.endDate.year, value.endDate.month - 1, value.endDate.day);
+
+    if (end < start) {
+      this.payableAmount = 0;
+      return;
+    }
+
+    const totalDays = this.getTotalApplicableDays(start, end, value.recurringDays);
+
+    let total = 0;
+    if (preferences.breakfast) total += parseFloat(mealType.breakfast_price) * totalDays;
+    if (preferences.lunch) total += parseFloat(mealType.lunch_price) * totalDays;
+    if (preferences.dinner) total += parseFloat(mealType.dinner_price) * totalDays;
+
+    this.payableAmount = total;
+  }
+
+  getTotalApplicableDays(start: Date, end: Date, recurringDays: string[]): number {
+    const dayMap: { [key: number]: string } = {
+      0: 'sun',
+      1: 'mon',
+      2: 'tue',
+      3: 'wed',
+      4: 'thu',
+      5: 'fri',
+      6: 'sat'
+    };
+
+    let count = 0;
+    const normalizedRecurring = recurringDays.map(day => day.toLowerCase());
+
+    const current = new Date(start);
+    while (current <= end) {
+      const dayStr = dayMap[current.getDay()];
+      if (normalizedRecurring.includes(dayStr)) {
+        count++;
+      }
+      current.setDate(current.getDate() + 1);
+    }
+
+    return count;
+  }
+
+  copyCustomerToDelivery(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      this.orderForm.patchValue({
+        deliveryAddress: this.orderForm.value.customerAddress
+      });
+    }
+  }
 
   toggleRecurringDay(day: string) {
     const current = this.orderForm.value.recurringDays;
@@ -127,21 +169,33 @@ export class OrdersComponent implements OnInit {
         recurringDays: [...current, day]
       });
     }
+    this.calculatePayableAmount();
   }
 
   submitOrder() {
     if (this.orderForm.valid) {
-      const formValue = { ...this.orderForm.value };
+      const value = this.orderForm.value;
 
-      formValue.startDate = this.formatDate(formValue.startDate);
-      formValue.endDate = this.formatDate(formValue.endDate);
+      const payload = {
+        name: value.customerName,
+        address: value.customerAddress,
+        delivery_address: value.deliveryAddress,
+        phone: value.contactNumber,
+        email: value.email,
+        meal_type_id: value.mealTypeId,
+        start_date: this.formatDate(value.startDate),
+        end_date: this.formatDate(value.endDate),
+        recurring_days: value.recurringDays.map((d: string) => d.toLowerCase()),
+        delivery_partner_id: value.deliveryPartner,
+        meal_preferences: {
+          breakfast: value.mealPreferences.breakfast,
+          lunch: value.mealPreferences.lunch,
+          dinner: value.mealPreferences.dinner
+        }
+      };
 
-      console.log('Submitted Order:', formValue);
-
-      this.service.createNewOrder(formValue).subscribe({
+      this.service.createNewOrder(payload).subscribe({
         next: (res) => {
-          console.log(res);
-          
           this.alertService.showAlert({
             message: 'Order Created',
             type: 'success',
@@ -150,11 +204,9 @@ export class OrdersComponent implements OnInit {
           });
           this.loadOrderList();
           this.orderForm.reset();
-          this.modalService.dismissAll()
+          this.modalService.dismissAll();
         },
         error: (err) => {
-          console.log(err);
-          
           this.alertService.showAlert({
             message: err.error.message,
             type: 'error',
@@ -166,12 +218,36 @@ export class OrdersComponent implements OnInit {
     }
   }
 
-
   openModal(content: any) {
     const buttonElement = document.activeElement as HTMLElement
     buttonElement.blur();
 
+    this.loadDeliveryPartners()
+    this.loadMealTypes()
+
     this.modalService.open(content, { size: 'lg' });
+  }
+
+  loadMealTypes() {
+    this.service.getMealTypes().subscribe({
+      next: (res: any) => {
+        this.mealTypes = res.data || []
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    })
+  }
+
+  loadDeliveryPartners() {
+    this.partnerService.getPartnerList().subscribe({
+      next: (res: any) => {
+        this.deliveryPartners = res.data || []
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    })
   }
 
   resetFilters() {

@@ -7,6 +7,8 @@ import { environment } from '../../../../environment/environment';
 })
 export class OrdersService {
   private BaseUrl = `${environment.apiUrl}/orders`
+  private OrderCreateUrl = `${environment.apiUrl}/fleet-manager/create-customer-order`
+  private mealTypeUrl = `${environment.apiUrl}/meal-types`
 
   constructor(
     private http: HttpClient
@@ -17,6 +19,10 @@ export class OrdersService {
   }
 
   createNewOrder(itm: any) {
-    return this.http.post(`${this.BaseUrl}`, itm)
+    return this.http.post(`${this.OrderCreateUrl}`, itm)
+  }
+
+  getMealTypes(){
+    return this.http.get(`${this.mealTypeUrl}`)
   }
 }

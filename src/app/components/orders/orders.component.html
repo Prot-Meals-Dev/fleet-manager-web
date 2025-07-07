@@ -46,26 +46,26 @@
                     <th>Address</th>
                     <th>Start Date</th>
                     <th>Delivering Today</th>
-                    <th>Delivery Partner</th>
-                    <th>Payment Status</th>
+                    <th>Meal Type</th>
+                    <!-- <th>Payment Status</th> -->
                     <th>Status</th>
                     <th>Edit</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let order of orders">
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.name }}</td>
-                    <td>{{ order.address }}</td>
-                    <td>{{ order.startDate }}</td>
+                <tr *ngFor="let order of orderList">
+                    <td>{{ order.order_id }}</td>
+                    <td>{{ order.user.name }}</td>
+                    <td>{{ order.delevery_address }}</td>
+                    <td>{{ order.start_date | date: 'dd-MM-yyyy' }}</td>
                     <td>{{'Maybe'}}</td>
-                    <td>{{ order.deliveryPartner }}</td>
-                    <td>
+                    <td>{{ order.meal_type.name }}</td>
+                    <!-- <td>
                         <span class="badge px-3 py-2"
                             [ngClass]="order.paymentStatus === 'Paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
                             {{ order.paymentStatus }}
                         </span>
-                    </td>
+                    </td> -->
                     <td>
                         <span class="badge px-3 py-2"
                             [ngClass]="order.completed ? 'bg-primary-subtle text-primary' : 'bg-secondary-subtle text-secondary'">
@@ -103,25 +103,47 @@
                     </div>
 
                     <div class="mb-3">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <label class="mb-0">Delivery Address</label>
-                            <div class="form-check m-0">
-                                <input type="checkbox" class="form-check-input" formControlName="sameAsCustomer"
-                                    id="sameAsCustomer">
-                                <label class="form-check-label text-danger ms-1" for="sameAsCustomer">(Same as customer
-                                    address)</label>
-                            </div>
-                        </div>
-                        <textarea rows="3" class="form-control mt-2" formControlName="deliveryAddress"
+                        <label>Customer Address</label>
+                        <textarea rows="3" class="form-control" formControlName="customerAddress"
+                            placeholder="Enter address"></textarea>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input type="checkbox" class="form-check-input" id="sameAsCustomer"
+                            (change)="copyCustomerToDelivery($event)">
+                        <label class="form-check-label" for="sameAsCustomer">
+                            Same as customer address
+                        </label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Delivery Address</label>
+                        <textarea rows="3" class="form-control" formControlName="deliveryAddress"
                             placeholder="Enter delivery address"></textarea>
                     </div>
 
+                    <div class="mb-3">
+                        <label>Meal Type</label>
+                        <select class="form-select" formControlName="mealTypeId">
+                            <option value="">Select Meal Type</option>
+                            <option *ngFor="let type of mealTypes" [value]="type.id">{{ type.name }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label>Phone Number</label>
+                        <input type="text" class="form-control" formControlName="contactNumber"
+                            placeholder="Enter phone number">
+                    </div>
 
                     <div class="mb-3 row">
                         <div class="col">
                             <label>Start Date</label>
                             <input class="form-control" placeholder="yyyy-mm-dd" formControlName="startDate"
-                                ngbDatepicker #startDp="ngbDatepicker" (click)="startDp.toggle()" readonly>
+                                ngbDatepicker [minDate]="minDate" #startDp="ngbDatepicker" (click)="startDp.toggle()" readonly>
                         </div>
                         <div class="col">
                             <label>End Date</label>
@@ -134,63 +156,40 @@
                         <label>Delivery Partner</label>
                         <select class="form-select" formControlName="deliveryPartner">
                             <option value="">Select Delivery Partner</option>
-                            <option *ngFor="let partner of deliveryPartners" [value]="partner">{{ partner }}</option>
+                            <option *ngFor="let partner of deliveryPartners" [value]="partner.id">
+                                {{ partner.name }}
+                            </option>
                         </select>
                     </div>
-                </div>
-
-                <!-- Right Column -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label>Contact Number</label>
-                        <input type="text" class="form-control" formControlName="contactNumber"
-                            placeholder="Enter phone number">
-                    </div>
 
                     <div class="mb-3">
-                        <label>Customer Address</label>
-                        <textarea rows="3" class="form-control" formControlName="customerAddress"
-                            placeholder="Enter customer address"></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>GPS Location</label>
-                        <input type="text" class="form-control" formControlName="gpsLocation"
-                            placeholder="Enter GPS location">
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Food Options</label>
+                        <label>Meal Preferences</label>
                         <div class="btn-group w-100 flex-wrap">
                             <button type="button" class="btn" [ngClass]="{
-        'btn-danger': orderForm.value.foodOption.includes('Breakfast'),
-        'btn-outline-danger': !orderForm.value.foodOption.includes('Breakfast')
-      }" (click)="toggleFoodOption('Breakfast')">
-                                Breakfast
-                            </button>
+                        'btn-danger': orderForm.get('mealPreferences.breakfast')?.value,
+                        'btn-outline-danger': !orderForm.get('mealPreferences.breakfast')?.value
+                      }" (click)="toggleFoodOption('Breakfast')">Breakfast</button>
+
                             <button type="button" class="btn" [ngClass]="{
-        'btn-danger': orderForm.value.foodOption.includes('Lunch'),
-        'btn-outline-danger': !orderForm.value.foodOption.includes('Lunch')
-      }" (click)="toggleFoodOption('Lunch')">
-                                Lunch
-                            </button>
+                        'btn-danger': orderForm.get('mealPreferences.lunch')?.value,
+                        'btn-outline-danger': !orderForm.get('mealPreferences.lunch')?.value
+                      }" (click)="toggleFoodOption('Lunch')">Lunch</button>
+
                             <button type="button" class="btn" [ngClass]="{
-        'btn-danger': orderForm.value.foodOption.includes('Dinner'),
-        'btn-outline-danger': !orderForm.value.foodOption.includes('Dinner')
-      }" (click)="toggleFoodOption('Dinner')">
-                                Dinner
-                            </button>
+                        'btn-danger': orderForm.get('mealPreferences.dinner')?.value,
+                        'btn-outline-danger': !orderForm.get('mealPreferences.dinner')?.value
+                      }" (click)="toggleFoodOption('Dinner')">Dinner</button>
                         </div>
                     </div>
-
 
                     <div class="mb-3">
                         <label>Recurring Days</label>
                         <div class="d-flex flex-wrap gap-2">
                             <ng-container *ngFor="let day of days">
-                                <button type="button" class="btn btn-sm"
-                                    [ngClass]="{'btn-outline-secondary': !orderForm.value.recurringDays.includes(day), 'btn-danger': orderForm.value.recurringDays.includes(day)}"
-                                    (click)="toggleRecurringDay(day)">
+                                <button type="button" class="btn btn-sm" [ngClass]="{
+                          'btn-outline-secondary': !orderForm.value.recurringDays.includes(day),
+                          'btn-danger': orderForm.value.recurringDays.includes(day)
+                        }" (click)="toggleRecurringDay(day)">
                                     {{ day }}
                                 </button>
                             </ng-container>
@@ -199,7 +198,6 @@
                 </div>
             </div>
 
-            <!-- Bottom Row -->
             <div class="row align-items-center mt-3">
                 <div class="col-md-6">
                     <div class="badge bg-dark fs-5 px-4 py-2">
