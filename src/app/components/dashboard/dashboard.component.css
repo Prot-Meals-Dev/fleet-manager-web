@@ -51,3 +51,21 @@
     font-weight: 700;
     color: #111;
 }
+
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.custom-table th,
+.custom-table td {
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.custom-table tbody tr {
+    transition: background-color 0.3s ease;
+}

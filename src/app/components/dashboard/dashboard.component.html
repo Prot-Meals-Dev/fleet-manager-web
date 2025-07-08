@@ -46,4 +46,38 @@
             </div>
         </div>
     </div>
+
+    <h5 class="fw-bold mt-4 mb-3">Recent Activities</h5>
+
+    <div class="table-responsive">
+        <table class="table custom-table align-middle text-center table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Meal Type</th>
+                    <th>Created At</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let order of allDeliveries">
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.name }}</td>
+                    <td>{{ order.user.address }}</td>
+                    <td>{{ order.assignment.meal_type }}</td>
+                    <td>{{ order.delivery_date | date: 'dd-MM-yyyy'}}</td>
+                    <td>
+                        <span class="badge px-3 py-2" [ngClass]="{
+      'bg-warning-subtle text-warning': order.status === 'pending',
+      'bg-success-subtle text-success': order.status === 'completed'
+    }">
+                            {{ order.status | titlecase }}
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
