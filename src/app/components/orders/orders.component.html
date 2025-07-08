@@ -11,22 +11,27 @@
         </div>
 
         <div class="filter-item border-end">
-            <input type="date" class="form-control border-0 h-100 rounded-0" [(ngModel)]="filters.startDate">
-        </div>
-
-        <div class="filter-item border-end">
-            <select class="form-select border-0 h-100 rounded-0" [(ngModel)]="filters.paymentStatus">
-                <option value="">Payment Status</option>
-                <option value="Paid">Paid</option>
-                <option value="Unpaid">Unpaid</option>
+            <select class="form-select border-0 h-100 rounded-0" [(ngModel)]="filters.deliveryPartnerId"
+                (ngModelChange)="loadOrderList()">
+                <option value="">All Partners</option>
+                <option *ngFor="let p of deliveryPartners" [value]="p.id">{{ p.name }}</option>
             </select>
         </div>
 
         <div class="filter-item border-end">
-            <select class="form-select border-0 h-100 rounded-0" [(ngModel)]="filters.orderStatus">
-                <option value="">Order Status</option>
-                <option value="Completed">Completed</option>
-                <option value="Pending">Pending</option>
+            <input class="form-control border-0 h-100 rounded-0" [(ngModel)]="filters.date" ngbDatepicker
+                #filterDp="ngbDatepicker" (click)="filterDp.toggle()" placeholder="yyyy-mm-dd" readonly
+                (ngModelChange)="loadOrderList()">
+        </div>
+
+        <div class="filter-item border-end">
+            <select class="form-select border-0 h-100 rounded-0" [(ngModel)]="filters.status"
+                (ngModelChange)="loadOrderList()">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
             </select>
         </div>
 

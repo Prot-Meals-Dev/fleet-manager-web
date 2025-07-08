@@ -16,9 +16,9 @@ import { Router } from '@angular/router';
 })
 export class OrdersComponent implements OnInit {
   filters = {
-    startDate: '',
-    paymentStatus: '',
-    orderStatus: ''
+    deliveryPartnerId: '',
+    date: '',
+    status: ''
   };
   orderForm!: FormGroup;
   orderList!: any[]
@@ -76,7 +76,7 @@ export class OrdersComponent implements OnInit {
 
   loadOrderList() {
     this.isLoading = true;
-    this.service.getOrdersList().subscribe({
+    this.service.getOrdersList(this.filters).subscribe({
       next: (res: any) => {
         this.orderList = res.data || [];
         this.isLoading = false;
@@ -353,10 +353,11 @@ export class OrdersComponent implements OnInit {
 
   resetFilters() {
     this.filters = {
-      startDate: '',
-      paymentStatus: '',
-      orderStatus: ''
+      deliveryPartnerId: '',
+      date: '',
+      status: ''
     };
+    this.loadOrderList();
   }
 
   formatDate(dateStruct: NgbDateStruct | null): string {
