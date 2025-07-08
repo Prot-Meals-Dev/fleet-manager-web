@@ -6,8 +6,8 @@ import { environment } from '../../../../environment/environment';
   providedIn: 'root'
 })
 export class OrdersService {
-  private BaseUrl = `${environment.apiUrl}/orders`
-  private OrderCreateUrl = `${environment.apiUrl}/fleet-manager/create-customer-order`
+  private BaseUrl = `${environment.apiUrl}/fleet-manager/orders`
+  private OrderUrl = `${environment.apiUrl}/fleet-manager`
   private mealTypeUrl = `${environment.apiUrl}/meal-types`
 
   constructor(
@@ -19,7 +19,7 @@ export class OrdersService {
   }
 
   createNewOrder(itm: any) {
-    return this.http.post(`${this.OrderCreateUrl}`, itm)
+    return this.http.post(`${this.OrderUrl}/create-customer-order`, itm)
   }
 
   getMealTypes(){
@@ -28,5 +28,9 @@ export class OrdersService {
 
   getOrderByID(id: string | null){
     return this.http.get(`${this.BaseUrl}/${id}`)
+  }
+
+  updateOrder(itm: any, id: any){
+    return this.http.patch(`${this.OrderUrl}/update-customer-order/${id}`, itm)
   }
 }

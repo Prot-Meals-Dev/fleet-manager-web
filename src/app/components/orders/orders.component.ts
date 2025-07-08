@@ -28,6 +28,7 @@ export class OrdersComponent implements OnInit {
   payableAmount: number = 0;
   minDate: NgbDateStruct;
   isLoading = false;
+  selectedOrder: any = null;
 
   constructor(
     private service: OrdersService,
@@ -44,6 +45,9 @@ export class OrdersComponent implements OnInit {
   ngOnInit(): void {
     this.loadOrderList()
     this.initForm();
+
+    this.loadDeliveryPartners()
+    this.loadMealTypes()
   }
 
   initForm() {
@@ -91,6 +95,8 @@ export class OrdersComponent implements OnInit {
   }
 
   toggleFoodOption(option: string) {
+    if (this.selectedOrder) return;
+
     const mealPreferences = this.orderForm.get('mealPreferences');
     if (mealPreferences) {
       const current = mealPreferences.get(option.toLowerCase());
@@ -102,7 +108,7 @@ export class OrdersComponent implements OnInit {
   }
 
   calculatePayableAmount() {
-    const value = this.orderForm.value;
+    const value = this.orderForm.getRawValue();
     const mealType = this.mealTypes.find(type => type.id === value.mealTypeId);
     const preferences = value.mealPreferences;
 
@@ -224,14 +230,103 @@ export class OrdersComponent implements OnInit {
     }
   }
 
+  onSubmitOrder() {
+    if (this.selectedOrder) {
+      this.updateOrder();
+    } else {
+      this.submitOrder();
+    }
+  }
+
   openModal(content: any) {
     const buttonElement = document.activeElement as HTMLElement
     buttonElement.blur();
 
-    this.loadDeliveryPartners()
-    this.loadMealTypes()
+    this.selectedOrder = null;
+    this.initForm();
 
     this.modalService.open(content, { size: 'lg' });
+  }
+
+  editOrder(order: any, content: any) {
+    this.selectedOrder = order;
+
+    const formattedRecurringDays = (order.recurring_days || []).map((day: string) => {
+      return day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+    });
+
+    this.orderForm.patchValue({
+      customerName: order.name,
+      email: order.email,
+      customerAddress: order.address,
+      deliveryAddress: order.delivery_address,
+      contactNumber: order.phone,
+      mealTypeId: order.meal_type_id,
+      startDate: this.parseDate(order.start_date),
+      endDate: this.parseDate(order.end_date),
+      deliveryPartner: order.delivery_partner_id,
+      recurringDays: formattedRecurringDays || [],
+      mealPreferences: {
+        breakfast: order.meal_preferences?.breakfast || false,
+        lunch: order.meal_preferences?.lunch || false,
+        dinner: order.meal_preferences?.dinner || false
+      }
+    });
+
+    this.orderForm.get('customerName')?.disable();
+    this.orderForm.get('email')?.disable();
+    this.orderForm.get('mealTypeId')?.disable();
+    this.orderForm.get('startDate')?.disable();
+    this.orderForm.get('endDate')?.disable();
+    this.orderForm.get('mealPreferences')?.disable();
+    this.orderForm.get('recurringDays')?.disable();
+
+    this.calculatePayableAmount();
+
+    this.modalService.open(content, { size: 'lg' });
+  }
+
+  parseDate(dateStr: string): NgbDateStruct {
+    const date = new Date(dateStr);
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate()
+    };
+  }
+
+  updateOrder() {
+    if (this.orderForm.valid && this.selectedOrder) {
+      const value = this.orderForm.value;
+      const payload = {
+        address: value.customerAddress,
+        delivery_address: value.deliveryAddress,
+        phone: value.contactNumber,
+        delivery_partner_id: value.deliveryPartner
+      };
+
+      this.service.updateOrder(payload, this.selectedOrder.id).subscribe({
+        next: () => {
+          this.alertService.showAlert({
+            message: 'Order Updated',
+            type: 'success',
+            autoDismiss: true,
+            duration: 4000
+          });
+          this.loadOrderList();
+          this.modalService.dismissAll();
+          this.selectedOrder = null;
+        },
+        error: (err) => {
+          this.alertService.showAlert({
+            message: err.error.message,
+            type: 'error',
+            autoDismiss: true,
+            duration: 4000
+          });
+        }
+      });
+    }
   }
 
   loadMealTypes() {
