@@ -13,6 +13,9 @@ export class DashboardComponent implements OnInit {
   allData!: any;
   allDeliveries!: any;
 
+  loadingCards = false;
+  loadingTable = false;
+
   constructor(
     private service: DashboardService,
     private alertService: AlertService
@@ -24,9 +27,11 @@ export class DashboardComponent implements OnInit {
   }
 
   loadData() {
+    this.loadingCards = true;
     this.service.getAnalytics().subscribe({
       next: (res: any) => {
         this.allData = res.data || {}
+        this.loadingCards = false;
       },
       error: (err) => {
         console.error(err);
@@ -36,14 +41,17 @@ export class DashboardComponent implements OnInit {
           autoDismiss: true,
           duration: 4000
         });
+        this.loadingCards = false;
       }
     })
   }
 
   loadDeliveries() {
+    this.loadingTable = true;
     this.service.getDeliveries().subscribe({
       next: (res: any) => {
         this.allDeliveries = res.data || []
+        this.loadingTable = false;
       },
       error: (err) => {
         console.error(err);
@@ -53,6 +61,7 @@ export class DashboardComponent implements OnInit {
           autoDismiss: true,
           duration: 4000
         });
+        this.loadingTable = false;
       }
     })
   }

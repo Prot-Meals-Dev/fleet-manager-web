@@ -1,5 +1,5 @@
 <div class="container-fluid">
-    <div class="row row-cols-1 row-cols-md-4 g-4">
+    <div class="row row-cols-1 row-cols-md-4 g-4" *ngIf="!loadingCards; else cardLoader">
         <div class="col">
             <div class="card dashboard-card p-3 position-relative">
                 <div class="icon-box position-absolute top-0 end-0 m-3 bg-orders">
@@ -47,9 +47,15 @@
         </div>
     </div>
 
+    <ng-template #cardLoader>
+        <div class="text-center my-5">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    </ng-template>
+
     <h5 class="fw-bold mt-4 mb-3">Recent Activities</h5>
 
-    <div class="table-responsive">
+    <div *ngIf="!loadingTable; else tableLoader" class="table-responsive">
         <table class="table custom-table align-middle text-center table-hover">
             <thead class="table-light">
                 <tr>
@@ -80,4 +86,10 @@
             </tbody>
         </table>
     </div>
+
+    <ng-template #tableLoader>
+        <div class="text-center my-5">
+            <div class="spinner-border text-success" role="status"></div>
+        </div>
+    </ng-template>
 </div>
