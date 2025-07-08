@@ -3,13 +3,14 @@ import { Component, OnInit } from '@angular/core';
 import { ConfirmationService } from '../../shared/components/confirmation-modal/service/confirmation.service';
 import { AlertService } from '../../shared/components/alert/service/alert.service';
 import { DeliveryPartnerService } from './service/delivery-partner.service';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 @Component({
   selector: 'app-delivery-partner',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, PaginationModule, FormsModule],
   templateUrl: './delivery-partner.component.html',
   styleUrl: './delivery-partner.component.css'
 })
@@ -19,6 +20,9 @@ export class DeliveryPartnerComponent implements OnInit {
   isLoading = false;
   editMode = false;
   selectedPartnerId: string | null = null;
+
+  currentPage = 1;
+  itemsPerPage = 10;
 
   constructor(
     private confirmationService: ConfirmationService,

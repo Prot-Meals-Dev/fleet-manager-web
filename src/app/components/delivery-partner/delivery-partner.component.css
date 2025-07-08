@@ -36,3 +36,14 @@ i.bi-pencil-square {
     width: 3rem;
     height: 3rem;
 }
+
+/* New pagination styles */
+.custom-pagination ::ng-deep .pagination .page-item.active .page-link {
+    background-color: #C0272D;
+    border-color: #C0272D;
+    color: white;
+}
+
+.custom-pagination ::ng-deep .pagination .page-item .page-link {
+    color: #C0272D;
+}

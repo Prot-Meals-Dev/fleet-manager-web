@@ -41,10 +41,15 @@
                             {{ partner.status ? 'Active' : 'Inactive' }}
                         </span>
                     </td>
-                    <td (click)="openCreateModal(createPartnerModal, partner)"><i class="bi bi-pencil-square" role="button"></i></td>
+                    <td (click)="openCreateModal(createPartnerModal, partner)"><i class="bi bi-pencil-square"
+                            role="button"></i></td>
                 </tr>
             </tbody>
         </table>
+        <pagination class="d-flex justify-content-center mt-3 custom-pagination" [totalItems]="allPartners.length"
+            [itemsPerPage]="itemsPerPage" [(ngModel)]="currentPage" previousText="‹" nextText="›"
+            [boundaryLinks]="true">
+        </pagination>
     </div>
 </div>
 
