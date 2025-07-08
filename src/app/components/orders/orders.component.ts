@@ -6,11 +6,12 @@ import { NgbCalendar, NgbDatepickerModule, NgbDateStruct, NgbModal } from '@ng-b
 import { AlertService } from '../../shared/components/alert/service/alert.service';
 import { DeliveryPartnerService } from '../delivery-partner/service/delivery-partner.service';
 import { Router } from '@angular/router';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 
 @Component({
   selector: 'app-orders',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgbDatepickerModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgbDatepickerModule, PaginationModule],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.css'
 })
@@ -18,7 +19,9 @@ export class OrdersComponent implements OnInit {
   filters = {
     deliveryPartnerId: '',
     date: '',
-    status: ''
+    status: '',
+    limit: 10,
+    page: 1
   };
   orderForm!: FormGroup;
   orderList!: any[]
@@ -29,6 +32,9 @@ export class OrdersComponent implements OnInit {
   minDate: NgbDateStruct;
   isLoading = false;
   selectedOrder: any = null;
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
 
   constructor(
     private service: OrdersService,
@@ -74,11 +80,14 @@ export class OrdersComponent implements OnInit {
     this.orderForm.get('endDate')?.valueChanges.subscribe(() => this.calculatePayableAmount());
   }
 
-  loadOrderList() {
+  loadOrderList(append?: boolean) {
     this.isLoading = true;
+    this.filters.limit = this.itemsPerPage;
+    this.filters.page = this.currentPage;
     this.service.getOrdersList(this.filters).subscribe({
       next: (res: any) => {
-        this.orderList = res.data || [];
+        this.orderList = res.data.data || [];
+        this.totalItems = res.data.total || 0;
         this.isLoading = false;
       },
       error: (err) => {
@@ -92,6 +101,11 @@ export class OrdersComponent implements OnInit {
         this.isLoading = false;
       }
     })
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.loadOrderList();
   }
 
   toggleFoodOption(option: string) {
@@ -355,8 +369,11 @@ export class OrdersComponent implements OnInit {
     this.filters = {
       deliveryPartnerId: '',
       date: '',
-      status: ''
+      status: '',
+      limit: this.itemsPerPage,
+      page: 1
     };
+    this.currentPage = 1;
     this.loadOrderList();
   }
 

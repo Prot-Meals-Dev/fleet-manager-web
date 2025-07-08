@@ -33,6 +33,14 @@ export class OrdersService {
       queryParams.push(`status=${filters.status}`);
     }
 
+    if (filters?.limit) {
+      queryParams.push(`limit=${filters.limit}`);
+    }
+
+    if (filters?.page) {
+      queryParams.push(`page=${filters.page}`);
+    }
+
     const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
 
     return this.http.get(`${this.BaseUrl}${queryString}`);
