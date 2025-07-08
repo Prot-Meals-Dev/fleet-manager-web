@@ -35,5 +35,18 @@ export class DeliveryPartnerDetailComponent implements OnInit {
         });
       }
     })
+
+    this.loadPartnerDeliveries(this.partnerId)
+  }
+
+  loadPartnerDeliveries(id: string | null) {
+    this.service.loadDeliveries(id).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
   }
 }

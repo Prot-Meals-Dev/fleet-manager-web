@@ -6,18 +6,16 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class DeliveryPartnerService {
-  private BaseUrl = `${environment.apiUrl}/fleet-manager/create-partner`
   private BaseUrl1 = `${environment.apiUrl}/users/delivery-partner`
-  private UpdateUrl = `${environment.apiUrl}/fleet-manager/update-partner`
   private GetUserUrl = `${environment.apiUrl}/users`
-
+  private fleetManUrl = `${environment.apiUrl}/fleet-manager`
 
   constructor(
     private http: HttpClient
   ) { }
 
   createPartner(itm: any) {
-    return this.http.post(`${this.BaseUrl}`, itm)
+    return this.http.post(`${this.fleetManUrl}/create-partner`, itm)
   }
 
   getPartnerList() {
@@ -25,10 +23,14 @@ export class DeliveryPartnerService {
   }
 
   updatePartner(id: string, itm: any) {
-    return this.http.patch(`${this.UpdateUrl}/${id}`, itm)
+    return this.http.patch(`${this.fleetManUrl}/update-partner/${id}`, itm)
   }
 
-  getPartner(id: string | null){
+  getPartner(id: string | null) {
     return this.http.get(`${this.GetUserUrl}/${id}`)
+  }
+
+  loadDeliveries(id: string | null) {
+    return this.http.get(`${this.fleetManUrl}/partner-orders/${id}`)
   }
 }
