@@ -33,4 +33,8 @@ export class DeliveryPartnerService {
   loadDeliveries(id: string | null) {
     return this.http.get(`${this.fleetManUrl}/partner-orders/${id}`)
   }
+
+  updateDeliverySequence(itm: any, id: any){
+    return this.http.patch(`${this.fleetManUrl}/delivery-sequence/${id}`, itm)
+  }
 }

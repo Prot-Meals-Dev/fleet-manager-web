@@ -3,3 +3,60 @@
     padding: 0.4em 0.6em;
     border-radius: 0.6rem;
 }
+
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.custom-table th,
+.custom-table td {
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.custom-table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+/* Drag handle styling */
+.drag-handle {
+    cursor: move;
+    width: 40px;
+    text-align: center;
+    color: #6c757d;
+}
+
+/* Style the dragged preview */
+.cdk-drag-preview {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    border-radius: 0.5rem;
+    transform: rotate(1deg) scale(1.02);
+    background-color: #fff;
+    padding: 0.5rem;
+    opacity: 0.95;
+}
+
+/* Reduce flicker: hide original row while dragging */
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+/* Highlight the row being hovered */
+tr[cdkDrag]:hover {
+    background-color: #f1f1f1;
+}
+
+/* Smooth drag feedback */
+tr[cdkDrag] {
+    transition: background-color 0.2s ease;
+}
+
+/* Optional: style for drop area */
+tbody[cdkDropList] {
+    border: 2px dashed #ccc;
+    border-radius: 0.5rem;
+}

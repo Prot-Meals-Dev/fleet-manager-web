@@ -2,34 +2,69 @@
     <h4 class="fw-bold">Delivery Partner</h4>
 
     <div class="d-flex justify-content-between align-items-start flex-wrap mt-2 p-4 rounded">
-
         <div class="d-flex align-items-start gap-3 flex-wrap">
-
             <div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="fw-semibold fs-5">{{ partner?.name }}</div>
                 </div>
-
                 <div class="d-flex align-items-center gap-3 mt-2 flex-wrap">
                     <div>{{ partner?.phone }}</div>
                     <div>{{ partner?.email }}</div>
                 </div>
             </div>
-
             <div class="d-flex flex-column gap-2 align-items-start pt-2">
                 <span class="badge bg-success text-capitalize">{{ partner?.status }}</span>
                 <span class="badge bg-light text-dark">30 Nos</span>
             </div>
         </div>
-
         <div class="d-flex flex-column gap-2">
-            <button class="btn btn-danger d-flex align-items-center">
-                <i class="bi bi-pencil-fill me-1"></i> Edit
+            <button class="btn btn-danger d-flex align-items-center" (click)="toggleEditMode()">
+                <i class="bi bi-pencil-fill me-1"></i> {{ isEditMode ? 'Cancel' : 'Edit' }}
             </button>
-            <button class="btn btn-warning text-white d-flex align-items-center">
+            <button class="btn btn-warning text-white d-flex align-items-center" (click)="saveReorderedDeliveries()">
                 <i class="bi bi-save-fill me-1"></i> Save
             </button>
         </div>
+    </div>
 
+    <div class="table-responsive">
+        <table class="table custom-table align-middle text-center table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th *ngIf="isEditMode"></th>
+                    <th>ID</th>
+                    <th>Meal Type</th>
+                    <th>Meal Name</th>
+                    <th>Phone Number</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody *ngIf="!isEditMode">
+                <tr *ngFor="let order of allDeliveries">
+                    <td>{{ order.order_id }}</td>
+                    <td>{{ order.meal_type }}</td>
+                    <td>{{ order.order.meal_type.name }}</td>
+                    <td>{{ order.order.user.phone || 'N/A' }}</td>
+                    <td>{{order.order.delevery_address}}</td>
+                </tr>
+            </tbody>
+            <tbody *ngIf="isEditMode" cdkDropList (cdkDropListDropped)="drop($event)">
+                <tr *ngFor="let order of allDeliveries" cdkDrag>
+
+                    <ng-template cdkDragPreview>
+                        <div style="display: none"></div>
+                    </ng-template>
+
+                    <td cdkDragHandle class="drag-handle">
+                        <i class="bi bi-grip-vertical fs-5 text-muted"></i>
+                    </td>
+                    <td>{{ order.order_id }}</td>
+                    <td>{{ order.meal_type }}</td>
+                    <td>{{ order.order.meal_type.name }}</td>
+                    <td>{{ order.order.user.phone || 'N/A' }}</td>
+                    <td>{{order.order.delevery_address}}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
