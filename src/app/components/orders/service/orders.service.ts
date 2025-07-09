@@ -10,6 +10,7 @@ export class OrdersService {
   private BaseUrl = `${environment.apiUrl}/fleet-manager/orders`
   private OrderUrl = `${environment.apiUrl}/fleet-manager`
   private mealTypeUrl = `${environment.apiUrl}/meal-types`
+  private OrderDetailUrl = `${environment.apiUrl}/orders`
 
   constructor(
     private http: HttpClient
@@ -55,7 +56,7 @@ export class OrdersService {
   }
 
   getOrderByID(id: string | null) {
-    return this.http.get(`${this.BaseUrl}/${id}`)
+    return this.http.get(`${this.OrderDetailUrl}/${id}`)
   }
 
   updateOrder(itm: any, id: any) {
