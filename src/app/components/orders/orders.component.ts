@@ -103,9 +103,12 @@ export class OrdersComponent implements OnInit {
     })
   }
 
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadOrderList();
+  onPageChange(event: { page: number; itemsPerPage: number }) {
+    if (this.currentPage !== event.page) {
+      this.currentPage = event.page;
+      this.itemsPerPage = event.itemsPerPage;
+      this.loadOrderList();
+    }
   }
 
   toggleFoodOption(option: string) {
