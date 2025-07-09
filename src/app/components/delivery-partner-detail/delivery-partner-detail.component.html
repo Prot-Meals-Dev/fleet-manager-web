@@ -27,6 +27,11 @@
         </div>
     </div>
 
+    <div *ngIf="allDeliveries.length === 0" class="text-center text-muted my-5">
+        <i class="bi bi-box fs-1 mb-3 d-block"></i>
+        <p class="fs-5">No deliveries found.</p>
+    </div>
+
     <div class="table-responsive">
         <table class="table custom-table align-middle text-center table-hover">
             <thead class="table-light">
