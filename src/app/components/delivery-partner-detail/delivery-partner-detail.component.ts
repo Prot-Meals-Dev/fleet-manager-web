@@ -16,7 +16,7 @@ export class DeliveryPartnerDetailComponent implements OnInit {
   partner!: any;
   isEditMode = false;
 
-  allDeliveries!: any[];
+  allDeliveries: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
