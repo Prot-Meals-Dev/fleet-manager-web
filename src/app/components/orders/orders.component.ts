@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OrdersService } from './service/orders.service';
-import { NgbCalendar, NgbDatepickerModule, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCalendar, NgbDate, NgbDatepickerModule, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../shared/components/alert/service/alert.service';
 import { DeliveryPartnerService } from '../delivery-partner/service/delivery-partner.service';
 import { Router } from '@angular/router';
@@ -30,6 +30,7 @@ export class OrdersComponent implements OnInit {
   days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   payableAmount: number = 0;
   minDate: NgbDateStruct;
+  today: NgbDateStruct;
   isLoading = false;
   selectedOrder: any = null;
   currentPage = 1;
@@ -45,7 +46,8 @@ export class OrdersComponent implements OnInit {
     private calendar: NgbCalendar,
     private router: Router
   ) {
-    this.minDate = this.calendar.getToday();
+    this.today = this.calendar.getToday();
+    this.minDate = this.today;
   }
 
   ngOnInit(): void {
@@ -200,6 +202,13 @@ export class OrdersComponent implements OnInit {
     }
     this.calculatePayableAmount();
   }
+
+  isDateDisabled = (date: NgbDate, current?: { year: number; month: number }): boolean => {
+    const todayDate = new Date(this.today.year, this.today.month - 1, this.today.day);
+    const checkDate = new Date(date.year, date.month - 1, date.day);
+    return checkDate <= todayDate; // disables today and earlier
+  };
+
 
   submitOrder() {
     if (this.orderForm.valid) {

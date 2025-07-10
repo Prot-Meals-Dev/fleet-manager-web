@@ -163,13 +163,13 @@
                         <div class="col">
                             <label>Start Date</label>
                             <input class="form-control" placeholder="yyyy-mm-dd" formControlName="startDate"
-                                ngbDatepicker [minDate]="minDate" #startDp="ngbDatepicker" (click)="startDp.toggle()"
+                                ngbDatepicker [minDate]="minDate" [markDisabled]="isDateDisabled" #startDp="ngbDatepicker" (click)="startDp.toggle()"
                                 readonly>
                         </div>
                         <div class="col">
                             <label>End Date</label>
-                            <input class="form-control" placeholder="yyyy-mm-dd" formControlName="endDate" ngbDatepicker
-                                #endDp="ngbDatepicker" (click)="endDp.toggle()" readonly>
+                            <input class="form-control" placeholder="yyyy-mm-dd" formControlName="endDate"  ngbDatepicker
+                                [markDisabled]="isDateDisabled" #endDp="ngbDatepicker" (click)="endDp.toggle()" readonly>
                         </div>
                     </div>
 
