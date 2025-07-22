@@ -1,0 +1,96 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="m-0">Manage Coupons</h2>
+        <button class="btn custom-btn" (click)="openCreateModal(createCouponModal)">Create Coupon</button>
+    </div>
+
+    <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center my-4">
+        <div class="spinner-border text-danger" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && allCoupon.length === 0" class="text-center text-muted my-5">
+        <i class="bi bi-box fs-1 mb-3 d-block"></i>
+        <p class="fs-5">No coupons found.</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="!isLoading && allCoupon.length > 0">
+        <table class="table custom-table align-middle text-center table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Coupon Code</th>
+                    <th>Days</th>
+                    <th>Discount Price</th>
+                    <th>Created At</th>
+                    <th>Expires At</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let cou of allCoupon">
+                    <td>{{ cou.id }}</td>
+                    <td>{{ cou.text }}</td>
+                    <td>{{ cou.days_added }}</td>
+                    <td>{{ cou.discount_price }}</td>
+                    <td>{{ cou.created_at | date: 'dd-MM-yyyy'}}</td>
+                    <td>{{ cou.expires_at | date: 'dd-MM-yyyy'}}</td>
+                    <td>
+                        <span class="badge px-3 py-2"
+                            [ngClass]="cou.status ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'">
+                            {{ cou.status ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                    <td role="button" (click)="deleteItem(cou)"><i class="bi bi-trash3"></i></td>
+                </tr>
+            </tbody>
+        </table>
+        <pagination class="d-flex justify-content-center mt-3 custom-pagination" [totalItems]="allCoupon.length"
+            [itemsPerPage]="itemsPerPage" [(ngModel)]="currentPage" previousText="‹" nextText="›"
+            [boundaryLinks]="true">
+        </pagination>
+    </div>
+</div>
+
+<ng-template #createCouponModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Create Coupon</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+
+    <form [formGroup]="couponForm" (ngSubmit)="onSubmit(modal)">
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="text" class="form-label">Coupon Code</label>
+                <input type="text" id="text" formControlName="text" placeholder="Enter Coupon Code"
+                    class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="days_added" class="form-label">Days Valid</label>
+                <input type="number" id="days_added" formControlName="days_added" placeholder="Enter Number of Days"
+                    class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="discount_price" class="form-label">Discount Price</label>
+                <input type="number" id="discount_price" formControlName="discount_price" placeholder="Enter Discount"
+                    class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="expires_at" class="form-label">Expires At</label>
+                <input class="form-control" placeholder="yyyy-mm-dd" formControlName="expires_at" ngbDatepicker
+                    #expDp="ngbDatepicker" (click)="expDp.toggle()" readonly>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="couponForm.invalid">
+                Create
+            </button>
+        </div>
+    </form>
+</ng-template>

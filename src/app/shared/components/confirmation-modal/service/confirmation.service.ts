@@ -18,6 +18,10 @@ export class ConfirmationService {
     });
     modalRef.componentInstance.question = question;
 
-    return modalRef.result;
+    return new Promise<boolean>((resolve) => {
+      modalRef.result
+        .then(() => resolve(true))
+        .catch(() => resolve(false));
+    });
   }
 }

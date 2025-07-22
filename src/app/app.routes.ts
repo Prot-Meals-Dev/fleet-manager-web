@@ -8,6 +8,7 @@ import { DeliveryPartnerDetailComponent } from './components/delivery-partner-de
 import { OrdersComponent } from './components/orders/orders.component';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
+import { CouponsComponent } from './components/coupons/coupons.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -21,7 +22,8 @@ export const routes: Routes = [
             { path: 'deliverypartner', component: DeliveryPartnerComponent },
             { path: 'orders', component: OrdersComponent },
             { path: 'deliverypartnerdetail/:id', component: DeliveryPartnerDetailComponent },
-            { path: 'orderdetail/:id', component: OrderDetailComponent }
+            { path: 'orderdetail/:id', component: OrderDetailComponent },
+            { path: 'coupons', component: CouponsComponent }
             // { path: '**', loadComponent: loadNotFoundComopnent }
         ]
     },
