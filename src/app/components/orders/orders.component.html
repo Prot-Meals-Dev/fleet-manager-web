@@ -70,7 +70,7 @@
             </thead>
             <tbody>
                 <tr *ngFor="let order of orderList">
-                    <td (click)="goToOrderDetail(order.id)">{{ order.id }}</td>
+                    <td (click)="goToOrderDetail(order.id)">{{ order.order_id }}</td>
                     <td (click)="goToOrderDetail(order.id)">{{ order.name }}</td>
                     <td (click)="goToOrderDetail(order.id)">{{ order.delivery_address }}</td>
                     <td (click)="goToOrderDetail(order.id)">{{ order.start_date | date: 'dd-MM-yyyy' }}</td>
