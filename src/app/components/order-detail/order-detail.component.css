@@ -1,10 +1,27 @@
 .detail-container {
+    display: flex;
     background-color: #f9f9f9;
     padding: 1.5rem;
     border-radius: 1rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    flex-wrap: wrap;
     max-width: 100%;
-    overflow-x: auto;
+    /* overflow-x: auto; */
+}
+
+.detail-left {
+    flex: 1 1 60%;
+    /* min-width: 300px; */
+}
+
+.detail-right {
+    flex: 1 1 35%;
+    min-width: 250px;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .detail-row {
@@ -86,6 +103,37 @@ button.btn-danger:hover {
 
 .modal-footer {
     border-top: 1px solid #dee2e6;
+}
+
+.pause-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.pause-list {
+    list-style: disc;
+    padding-left: 1.2rem;
+    margin: 0;
+}
+
+.pause-list li {
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .detail-container {
+        flex-direction: column;
+    }
+
+    .detail-left,
+    .detail-right {
+        width: 100%;
+    }
+
+    .detail-right {
+        margin-top: 2rem;
+    }
 }
 
 @media (max-width: 576px) {
