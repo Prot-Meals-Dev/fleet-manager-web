@@ -62,4 +62,16 @@ export class OrdersService {
   updateOrder(itm: any, id: any) {
     return this.http.patch(`${this.OrderUrl}/update-customer-order/${id}`, itm)
   }
+
+  pauseOrder(id: string, status: string) {
+    return this.http.patch(`${this.OrderDetailUrl}/${id}/status/${status}`, {})
+  }
+
+  customPauseOrder(id: any, dates: any[]) {
+    let itm = {
+      dates: dates
+    }
+    return this.http.patch(`${this.OrderDetailUrl}/${id}/pause-days`, itm)
+  }
+
 }

@@ -5,7 +5,12 @@
     <div class="detail-row">
       <div class="detail-label">Order ID</div>
       <div class="detail-colon">:</div>
-      <div class="detail-value">{{ order.order_id }}</div>
+      <div class="detail-value d-flex justify-content-between align-items-center">
+        {{ order.order_id }}
+        <button class="btn btn-warning btn-sm ms-3" (click)="openPauseModal(pauseModal)">
+          {{ order.status === 'active' ? 'Pause' : 'Resume' }}
+        </button>
+      </div>
 
       <div class="detail-gap"></div>
 
@@ -58,7 +63,53 @@
     </div>
   </div>
 
-  <!-- <div class="text-end mt-4">
-    <button class="btn btn-danger rounded-pill px-4 py-2">Generate Coupon</button>
-  </div> -->
 </div>
+
+<ng-template #pauseModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title fw-bold text-danger">Pause Order</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body row gx-4">
+    <!-- Left Column: Datepicker -->
+    <div class="col-12 col-md-7 mb-4 mb-md-0 border-end">
+      <p class="mb-2">
+        Select the dates you want to pause between:
+      </p>
+      <p>
+        <span class="fw-bold">{{ order?.start_date | date: 'dd MMM yyyy' }}</span> –
+        <span class="fw-bold">{{ order?.end_date | date: 'dd MMM yyyy' }}</span>
+      </p>
+
+      <div class="border rounded p-2">
+        <ngb-datepicker [dayTemplate]="customDay" outsideDays="hidden"></ngb-datepicker>
+      </div>
+    </div>
+
+    <!-- Right Column: Selected Dates -->
+    <div class="col-12 col-md-5">
+      <label class="form-label fw-bold mb-2">Selected Pause Dates:</label>
+      <ul class="list-group small scroll-box" *ngIf="selectedDates.length > 0">
+        <li *ngFor="let d of selectedDates" class="list-group-item py-1 px-2">
+          {{ toDate(d) | date: 'dd MMM yyyy' }}
+        </li>
+      </ul>
+      <p *ngIf="selectedDates.length === 0" class="text-muted">No dates selected</p>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button class="btn btn-danger" [disabled]="selectedDates.length === 0" (click)="submitPause(modal)">
+      Pause Order
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #customDay let-date let-currentMonth="currentMonth" let-selected="selected">
+  <span class="custom-day" [class.bg-danger]="isDateSelected(date)" [class.disabled-date]="!isDateInRange(date)"
+    (click)="isDateInRange(date) && toggleDate(date)">
+    {{ date.day }}
+  </span>
+</ng-template>

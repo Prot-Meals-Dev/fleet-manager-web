@@ -50,7 +50,44 @@ button.btn-danger:hover {
     background-color: #990000;
 }
 
-/* Responsive: Stack labels and values vertically on small screens */
+.custom-day {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    text-align: center;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.custom-day:hover {
+    background-color: #f1f1f1;
+}
+
+.custom-day.disabled-date {
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+.scroll-box {
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+}
+
+.modal-body p {
+    margin-bottom: 0.5rem;
+}
+
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
 @media (max-width: 576px) {
     .detail-row {
         grid-template-columns: 1fr;
@@ -72,5 +109,14 @@ button.btn-danger:hover {
 
     .detail-border {
         margin-top: 0.5rem;
+    }
+
+    .modal-body {
+        flex-direction: column;
+    }
+
+    .modal-body .col-md-7,
+    .modal-body .col-md-5 {
+        border: none !important;
     }
 }

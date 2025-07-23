@@ -7,6 +7,7 @@ import { AlertService } from '../../shared/components/alert/service/alert.servic
 import { DeliveryPartnerService } from '../delivery-partner/service/delivery-partner.service';
 import { Router } from '@angular/router';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ConfirmationService } from '../../shared/components/confirmation-modal/service/confirmation.service';
 
 
 @Component({
@@ -44,7 +45,8 @@ export class OrdersComponent implements OnInit {
     private alertService: AlertService,
     private partnerService: DeliveryPartnerService,
     private calendar: NgbCalendar,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService
   ) {
     this.today = this.calendar.getToday();
     this.minDate = this.today;
@@ -397,5 +399,37 @@ export class OrdersComponent implements OnInit {
 
   goToOrderDetail(orderId: string) {
     this.router.navigate(['/orderdetail', orderId]);
+  }
+
+  toggleOrderStatus(order: any): void {
+    const isCurrentlyActive = order.status === 'active';
+    const newStatus = isCurrentlyActive ? 'paused' : 'active';
+    const confirmationText = `Are you sure you want to ${isCurrentlyActive ? 'pause' : 'resume'} this order?`;
+
+    this.confirmationService.confirm(confirmationText).then(confirmed => {
+      if (confirmed) {
+        this.service.pauseOrder(order.id, newStatus).subscribe({
+          next: () => {
+            order.status = newStatus;
+            this.alertService.showAlert({
+              message: 'Order Paused',
+              type: 'success',
+              autoDismiss: true,
+              duration: 4000
+            });
+            this.loadOrderList();
+          },
+          error: err => {
+            console.error('Failed to update order status:', err);
+            this.alertService.showAlert({
+              message: err.error.message,
+              type: 'success',
+              autoDismiss: true,
+              duration: 4000
+            });
+          }
+        });
+      }
+    });
   }
 }

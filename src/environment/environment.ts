@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiUrl: 'https://api.protmeals.com/v1'
+    apiUrl: 'https://staging.protmeals.com/v1'
 };

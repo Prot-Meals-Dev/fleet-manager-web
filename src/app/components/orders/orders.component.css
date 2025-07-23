@@ -19,8 +19,29 @@
     color: white;
 }
 
-i.bi-pencil-square {
+.action-icons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 1.2rem;
+}
+
+.edit-icon {
     color: #C0272D;
+    transition: color 0.3s;
+}
+
+.edit-icon:hover {
+    color: #a61e22;
+}
+
+.pause-icon {
+    color: #ffc107;
+    transition: color 0.3s;
+}
+
+.pause-icon:hover {
+    color: #e0a800;
 }
 
 .custom-table {

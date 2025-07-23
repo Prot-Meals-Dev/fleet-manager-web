@@ -65,7 +65,7 @@
                     <th>Meal Type</th>
                     <!-- <th>Payment Status</th> -->
                     <th>Status</th>
-                    <th>Edit</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -84,11 +84,16 @@
                     </td> -->
                     <td (click)="goToOrderDetail(order.id)">
                         <span class="badge px-3 py-2"
-                            [ngClass]="order.completed ? 'bg-primary-subtle text-primary' : 'bg-secondary-subtle text-secondary'">
-                            {{ order.completed ? 'Completed' : 'Pending' }}
+                            [ngClass]="order.status === 'active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'">
+                            {{ order.status === 'active' ? 'active' : 'paused' }}
                         </span>
                     </td>
-                    <td (click)="editOrder(order, content)"><i class="bi bi-pencil-square" role="button"></i></td>
+                    <td class="action-icons">
+                        <i class="bi bi-pencil-square edit-icon" role="button" title="Edit Order"
+                            (click)="editOrder(order, content)"></i>
+                        <i class="bi bi-pause-circle pause-icon" role="button" title="Pause Order"
+                            (click)="toggleOrderStatus(order)"></i>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -163,13 +168,14 @@
                         <div class="col">
                             <label>Start Date</label>
                             <input class="form-control" placeholder="yyyy-mm-dd" formControlName="startDate"
-                                ngbDatepicker [minDate]="minDate" [markDisabled]="isDateDisabled" #startDp="ngbDatepicker" (click)="startDp.toggle()"
-                                readonly>
+                                ngbDatepicker [minDate]="minDate" [markDisabled]="isDateDisabled"
+                                #startDp="ngbDatepicker" (click)="startDp.toggle()" readonly>
                         </div>
                         <div class="col">
                             <label>End Date</label>
-                            <input class="form-control" placeholder="yyyy-mm-dd" formControlName="endDate"  ngbDatepicker
-                                [markDisabled]="isDateDisabled" #endDp="ngbDatepicker" (click)="endDp.toggle()" readonly>
+                            <input class="form-control" placeholder="yyyy-mm-dd" formControlName="endDate" ngbDatepicker
+                                [markDisabled]="isDateDisabled" #endDp="ngbDatepicker" (click)="endDp.toggle()"
+                                readonly>
                         </div>
                     </div>
 
