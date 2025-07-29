@@ -84,10 +84,16 @@ export class OrdersComponent implements OnInit {
     this.orderForm.get('endDate')?.valueChanges.subscribe(() => this.calculatePayableAmount());
   }
 
-  loadOrderList(append?: boolean) {
+  loadOrderList(bool?: boolean) {
     this.isLoading = true;
     this.filters.limit = this.itemsPerPage;
     this.filters.page = this.currentPage;
+
+    if (bool) {
+      this.filters.limit = 10;
+      this.filters.page = 1;
+    }
+
     this.service.getOrdersList(this.filters).subscribe({
       next: (res: any) => {
         this.orderList = res.data.data || [];

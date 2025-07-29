@@ -12,7 +12,7 @@
 
         <div class="filter-item border-end">
             <select class="form-select border-0 h-100 rounded-0" [(ngModel)]="filters.deliveryPartnerId"
-                (ngModelChange)="loadOrderList()">
+                (ngModelChange)="loadOrderList(true)">
                 <option value="">All Partners</option>
                 <option *ngFor="let p of deliveryPartners" [value]="p.id">{{ p.name }}</option>
             </select>
@@ -21,12 +21,12 @@
         <div class="filter-item border-end">
             <input class="form-control border-0 h-100 rounded-0" [(ngModel)]="filters.date" ngbDatepicker
                 #filterDp="ngbDatepicker" (click)="filterDp.toggle()" placeholder="yyyy-mm-dd" readonly
-                (ngModelChange)="loadOrderList()">
+                (ngModelChange)="loadOrderList(true)">
         </div>
 
         <div class="filter-item border-end">
             <select class="form-select border-0 h-100 rounded-0" [(ngModel)]="filters.status"
-                (ngModelChange)="loadOrderList()">
+                (ngModelChange)="loadOrderList(true)">
                 <option value="">All Status</option>
                 <option value="active">Active</option>
                 <option value="paused">Paused</option>
