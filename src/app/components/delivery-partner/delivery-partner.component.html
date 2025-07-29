@@ -38,7 +38,7 @@
                     <td (click)="goToPartnerDetail(partner.id)">
                         <span class="badge px-3 py-2"
                             [ngClass]="partner.status ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'">
-                            {{ partner.status ? 'Active' : 'Inactive' }}
+                            {{ partner.status === 'active' ? 'active' : 'inactive' }}
                         </span>
                     </td>
                     <td (click)="openCreateModal(createPartnerModal, partner)"><i class="bi bi-pencil-square"
