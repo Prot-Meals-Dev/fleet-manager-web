@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environment/environment';
+import { Router } from '@angular/router';
 
 interface LoginResponse {
   success: boolean;
@@ -25,7 +26,7 @@ export class AuthService {
   private readonly userKey = 'user';
   private baseUrl = `${environment.apiUrl}/auth`
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, { email, password }).pipe(
@@ -41,6 +42,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    this.router.navigate(['/login'])
   }
 
   getToken(): string | null {
@@ -57,7 +59,7 @@ export class AuthService {
     return token !== null && !this.isTokenExpired(token);
   }
 
-  private isTokenExpired(token: string): boolean {
+  public isTokenExpired(token: string): boolean {
     try {
       const payloadBase64 = token.split('.')[1];
       const payloadJson = atob(payloadBase64);
