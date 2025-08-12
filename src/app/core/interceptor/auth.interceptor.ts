@@ -2,6 +2,7 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
 import { AlertService } from '../../shared/components/alert/service/alert.service';
+import { throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -18,7 +19,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         duration: 4000
       });
       authService.logout();
-      return next(req);
+      
+      return throwError(() => new Error('Token expired'));
     }
 
     const clonedRequest = req.clone({
