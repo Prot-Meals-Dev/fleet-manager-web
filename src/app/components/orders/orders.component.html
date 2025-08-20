@@ -91,8 +91,11 @@
                     <td class="action-icons">
                         <i class="bi bi-pencil-square edit-icon" role="button" title="Edit Order"
                             (click)="editOrder(order, content)"></i>
-                        <i class="bi bi-pause-circle pause-icon" role="button" title="Pause Order"
-                            (click)="toggleOrderStatus(order)"></i>
+                        <i class="bi"
+                            [ngClass]="order.status === 'active' ? 'bi-pause-circle pause-icon' : 'bi-play-circle resume-icon'"
+                            role="button" [title]="order.status === 'active' ? 'Pause Order' : 'Resume Order'"
+                            (click)="toggleOrderStatus(order)">
+                        </i>
                     </td>
                 </tr>
             </tbody>

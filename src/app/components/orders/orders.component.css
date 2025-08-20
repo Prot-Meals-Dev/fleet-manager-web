@@ -44,6 +44,15 @@
     color: #e0a800;
 }
 
+.resume-icon {
+  color: #28a745;
+  transition: color 0.3s;
+}
+
+.resume-icon:hover {
+  color: #218838;
+}
+
 .custom-table {
     border-collapse: separate;
     border-spacing: 0;

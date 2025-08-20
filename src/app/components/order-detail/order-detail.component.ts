@@ -47,6 +47,23 @@ export class OrderDetailComponent implements OnInit {
     })
   }
 
+  loadDetails(){    this.service.getOrderByID(this.orderId).subscribe({
+      next: (res: any) => {
+        this.order = res.data || {}
+
+        this.startDate = this.convertToStruct(this.order.start_date);
+        this.endDate = this.convertToStruct(this.order.end_date);
+      },
+      error: (err) => {
+        this.alertService.showAlert({
+          message: err.error.message,
+          type: 'error',
+          autoDismiss: true,
+          duration: 4000
+        });
+      }
+    })}
+
   convertToStruct(dateStr: string): NgbDateStruct {
     const date = new Date(dateStr);
     return {
@@ -101,8 +118,6 @@ export class OrderDetailComponent implements OnInit {
       `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`
     );
 
-    console.log(dates);
-
     this.service.customPauseOrder(this.orderId, dates).subscribe({
       next: () => {
         this.alertService.showAlert({
@@ -111,6 +126,7 @@ export class OrderDetailComponent implements OnInit {
           autoDismiss: true,
           duration: 3000
         });
+        this.loadDetails()
         modal.close();
       },
       error: (err) => {
