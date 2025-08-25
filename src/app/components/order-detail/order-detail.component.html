@@ -39,14 +39,15 @@
 
         <div class="detail-border"></div>
 
-        <!-- <div class="detail-label">Meals Selected</div>
+        <div class="detail-label">Meals Selected</div>
         <div class="detail-colon">:</div>
         <div class="detail-value">
-          <span *ngIf="order.meal_type?.lunch_price">Lunch</span>
-          <span *ngIf="order.meal_type?.dinner_price">, Dinner</span>
+          <span *ngIf="order.preferences[0]?.breakfast">BreakFast <span *ngIf="order.preferences[0]?.lunch || order.preferences[0]?.dinner">|</span></span>
+          <span *ngIf="order.preferences[0]?.lunch"> Lunch <span *ngIf="order.preferences[0]?.breakfast || order.preferences[0]?.dinner">|</span></span>
+          <span *ngIf="order.preferences[0]?.dinner"> Dinner</span>
         </div>
 
-        <div class="detail-border"></div> -->
+        <div class="detail-border"></div>
 
         <div class="detail-label">Start Date</div>
         <div class="detail-colon">:</div>
