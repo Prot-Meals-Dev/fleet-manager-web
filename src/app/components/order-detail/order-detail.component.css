@@ -47,6 +47,25 @@
     word-break: break-word;
 }
 
+.meal-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.meal-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.meal-item .divider {
+  margin: 0 0.5rem;
+  color: #888;
+  font-weight: 400;
+}
+
 .detail-border {
     grid-column: 1 / -1;
     border-bottom: 1px solid #ddd;
