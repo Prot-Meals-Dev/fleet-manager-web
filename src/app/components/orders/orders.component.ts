@@ -289,6 +289,8 @@ export class OrdersComponent implements OnInit {
       return day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
     });
 
+    console.log(order);
+
     this.orderForm.patchValue({
       customerName: order.name,
       email: order.email,
@@ -298,7 +300,7 @@ export class OrdersComponent implements OnInit {
       mealTypeId: order.meal_type_id,
       startDate: this.parseDate(order.start_date),
       endDate: this.parseDate(order.end_date),
-      deliveryPartner: order.delivery_partner_id,
+      deliveryPartner: order.delivery_assignments[0].delivery_partner_id,
       recurringDays: formattedRecurringDays || [],
       mealPreferences: {
         breakfast: order.meal_preferences?.breakfast || false,
@@ -306,6 +308,8 @@ export class OrdersComponent implements OnInit {
         dinner: order.meal_preferences?.dinner || false
       }
     });
+
+    console.log(this.orderForm.value);
 
     this.orderForm.get('customerName')?.disable();
     this.orderForm.get('email')?.disable();
