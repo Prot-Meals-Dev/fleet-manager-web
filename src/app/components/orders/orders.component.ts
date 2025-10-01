@@ -76,7 +76,8 @@ export class OrdersComponent implements OnInit {
         breakfast: [false],
         lunch: [false],
         dinner: [false]
-      })
+      }),
+      remarks: ['']
     });
 
     this.orderForm.get('mealTypeId')?.valueChanges.subscribe(() => this.calculatePayableAmount());
@@ -237,7 +238,8 @@ export class OrdersComponent implements OnInit {
           breakfast: value.mealPreferences.breakfast,
           lunch: value.mealPreferences.lunch,
           dinner: value.mealPreferences.dinner
-        }
+        },
+        remarks: value.remarks
       };
 
       this.service.createNewOrder(payload).subscribe({
@@ -289,8 +291,6 @@ export class OrdersComponent implements OnInit {
       return day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
     });
 
-    console.log(order);
-
     this.orderForm.patchValue({
       customerName: order.name,
       email: order.email,
@@ -306,10 +306,9 @@ export class OrdersComponent implements OnInit {
         breakfast: order.meal_preferences?.breakfast || false,
         lunch: order.meal_preferences?.lunch || false,
         dinner: order.meal_preferences?.dinner || false
-      }
+      },
+      remarks: order.remarks
     });
-
-    console.log(this.orderForm.value);
 
     this.orderForm.get('customerName')?.disable();
     this.orderForm.get('email')?.disable();
@@ -340,7 +339,8 @@ export class OrdersComponent implements OnInit {
         address: value.customerAddress,
         delivery_address: value.deliveryAddress,
         phone: value.contactNumber,
-        delivery_partner_id: value.deliveryPartner
+        delivery_partner_id: value.deliveryPartner,
+        remarks: value.remarks
       };
 
       this.service.updateOrder(payload, this.selectedOrder.id).subscribe({
