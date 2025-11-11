@@ -35,6 +35,15 @@
     color: #a61e22;
 }
 
+.delete-icon {
+    color: #C0272D;
+    transition: color 0.3s;
+}
+
+.delete-icon:hover {
+    color: #a61e22;
+}
+
 .pause-icon {
     color: #ffc107;
     transition: color 0.3s;

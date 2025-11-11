@@ -140,6 +140,66 @@ button.btn-danger:hover {
     font-size: 0.95rem;
 }
 
+
+
+/* Already paused dates (orange/yellow) */
+.custom-day.bg-warning {
+  background-color: #ffc107;
+  border-radius: 50%;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* White text for selected and paused dates */
+.custom-day.text-white {
+  color: white;
+  font-weight: 500;
+}
+
+/* Dates from other months */
+.custom-day.outside {
+  color: #999;
+}
+
+/* Hover effect for available dates */
+.custom-day:not(.disabled-date):not(.bg-warning):hover {
+  background-color: #e9ecef;
+  border-radius: 50%;
+}
+
+/* Optional: Add a legend in your modal */
+/* .date-legend {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.date-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.date-legend-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+} */
+
+/* .legend-selected {
+  background-color: #dc3545;
+}
+
+.legend-paused {
+  background-color: #ffc107;
+}
+
+.legend-disabled {
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+} */
+
 @media (max-width: 768px) {
     .detail-container {
         flex-direction: column;

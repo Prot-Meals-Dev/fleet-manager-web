@@ -65,6 +65,7 @@ export class OrdersComponent implements OnInit {
       customerName: [''],
       customerAddress: [''],
       deliveryAddress: [''],
+      locationUrl: [''],
       contactNumber: [''],
       email: [''],
       mealTypeId: [''],
@@ -227,6 +228,7 @@ export class OrdersComponent implements OnInit {
         name: value.customerName,
         address: value.customerAddress,
         delivery_address: value.deliveryAddress,
+        location_url: value.locationUrl,
         phone: value.contactNumber,
         email: value.email,
         meal_type_id: value.mealTypeId,
@@ -241,6 +243,7 @@ export class OrdersComponent implements OnInit {
         },
         remarks: value.remarks
       };
+  
 
       this.service.createNewOrder(payload).subscribe({
         next: (res) => {

@@ -18,6 +18,7 @@ export class OrderDetailComponent implements OnInit {
   startDate!: NgbDateStruct;
   endDate!: NgbDateStruct;
   selectedDates: NgbDateStruct[] = [];
+  pausedDates: NgbDateStruct[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -35,6 +36,10 @@ export class OrderDetailComponent implements OnInit {
 
         this.startDate = this.convertToStruct(this.order.start_date);
         this.endDate = this.convertToStruct(this.order.end_date);
+
+      this.pausedDates = this.order.order_pauses.map((pause: any) => 
+        this.convertToStruct(pause.pause_date)
+      );
       },
       error: (err) => {
         this.alertService.showAlert({
@@ -47,12 +52,17 @@ export class OrderDetailComponent implements OnInit {
     })
   }
 
-  loadDetails(){    this.service.getOrderByID(this.orderId).subscribe({
+  loadDetails() {
+    this.service.getOrderByID(this.orderId).subscribe({
       next: (res: any) => {
         this.order = res.data || {}
 
         this.startDate = this.convertToStruct(this.order.start_date);
         this.endDate = this.convertToStruct(this.order.end_date);
+
+        this.pausedDates = this.order.order_pauses.map((pause: any) => 
+        this.convertToStruct(pause.pause_date)
+      );
       },
       error: (err) => {
         this.alertService.showAlert({
@@ -62,7 +72,15 @@ export class OrderDetailComponent implements OnInit {
           duration: 4000
         });
       }
-    })}
+    })
+  }
+
+  // New Method to check if date is already paused
+  isDateAlreadyPaused(date: NgbDateStruct): boolean {
+    return this.pausedDates.some(d => 
+      d.day === date.day && d.month === date.month && d.year === date.year
+    );
+  }
 
   convertToStruct(dateStr: string): NgbDateStruct {
     const date = new Date(dateStr);
@@ -81,6 +99,11 @@ export class OrderDetailComponent implements OnInit {
   }
 
   toggleDate(date: NgbDateStruct) {
+
+    if (this.isDateAlreadyPaused(date)) {
+      return;
+    }
+
     const index = this.selectedDates.findIndex(d =>
       d.day === date.day && d.month === date.month && d.year === date.year
     );
@@ -139,5 +162,59 @@ export class OrderDetailComponent implements OnInit {
       }
     });
   }
+
+  getTomorrow(): NgbDateStruct {
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    return {
+      year: today.getFullYear(),
+      month: today.getMonth() + 1,
+      day: today.getDate()
+    }
+  }
+
+  /**
+   * Gets the day after the start date
+   */
+  getDayAfterStartDate(): NgbDateStruct {
+    const startDateObj = new Date(this.startDate.year, this.startDate.month - 1, this.startDate.day);
+    startDateObj.setDate(startDateObj.getDate() + 1);
+    return {
+      year: startDateObj.getFullYear(),
+      month: startDateObj.getMonth() + 1,
+      day: startDateObj.getDate()
+    };
+  }
+
+ 
+markDisabled = (date: NgbDateStruct, current?: { year: number; month: number }) => {
+  const selectedDate = new Date(date.year, date.month - 1, date.day);
+  selectedDate.setHours(0, 0, 0, 0);
+
+  // Get today's date (current day should not be selectable)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Get tomorrow's date (minimum selectable date)
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  // Get start date
+  const startDateObj = new Date(this.startDate.year, this.startDate.month - 1, this.startDate.day);
+  startDateObj.setHours(0, 0, 0, 0);
+
+  // Get end date
+  const endDateObj = new Date(this.endDate.year, this.endDate.month - 1, this.endDate.day);
+  endDateObj.setHours(0, 0, 0, 0);
+
+  // To check if date is already paused
+  const isDateAlreadyPaused = this.isDateAlreadyPaused(date);
+
+  // Disable if:
+  // 1. Date is before tomorrow (includes today and all past dates)
+  // 2. Date is before start date
+  // 3. Date is after end date
+  return selectedDate < tomorrow || selectedDate < startDateObj || selectedDate > endDateObj || isDateAlreadyPaused;
+}
 
 }

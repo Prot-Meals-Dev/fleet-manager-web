@@ -96,6 +96,8 @@
                             role="button" [title]="order.status === 'active' ? 'Pause Order' : 'Resume Order'"
                             (click)="toggleOrderStatus(order)">
                         </i>
+                         <i class="bi bi-trash3 delete-icon" role="button" title="Delete Order"
+                            ></i>
                     </td>
                 </tr>
             </tbody>
@@ -151,12 +153,11 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>Meal Type</label>
-                        <select class="form-select" formControlName="mealTypeId">
-                            <option value="">Select Meal Type</option>
-                            <option *ngFor="let type of mealTypes" [value]="type.id">{{ type.name }}</option>
-                        </select>
+                        <label>Location URL</label>
+                        <input type="text" class="form-control" formControlName="locationUrl"
+                            placeholder="Enter Location Url">
                     </div>
+
                 </div>
 
                 <!-- Right Column -->
@@ -212,14 +213,22 @@
                         </div>
                     </div>
 
+                     <div class="mb-3">
+                        <label>Meal Type</label>
+                        <select class="form-select" formControlName="mealTypeId">
+                            <option value="">Select Meal Type</option>
+                            <option *ngFor="let type of mealTypes" [value]="type.id">{{ type.name }}</option>
+                        </select>
+                    </div>
+
                     <div class="mb-3">
                         <label>Recurring Days</label>
                         <div class="d-flex flex-wrap gap-2">
                             <ng-container *ngFor="let day of days">
                                 <button type="button" class="btn btn-sm" [ngClass]="{
-    'btn-outline-secondary': !(orderForm.get('recurringDays')?.value || []).includes(day),
-    'btn-danger': (orderForm.get('recurringDays')?.value || []).includes(day)
-  }" [disabled]="selectedOrder" (click)="toggleRecurringDay(day)">
+                                        'btn-outline-secondary': !(orderForm.get('recurringDays')?.value || []).includes(day),
+                                        'btn-danger': (orderForm.get('recurringDays')?.value || []).includes(day)
+                                    }" [disabled]="selectedOrder" (click)="toggleRecurringDay(day)">
                                     {{ day }}
                                 </button>
 

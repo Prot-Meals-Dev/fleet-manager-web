@@ -3,43 +3,34 @@
 
   <div class="detail-container">
     <div class="detail-left">
+      <!-- Order Detail Fields -->
       <div class="detail-row">
         <div class="detail-label">Order ID</div>
         <div class="detail-colon">:</div>
         <div class="detail-value d-flex justify-content-between align-items-center">
           {{ order.order_id }}
-          <button *ngIf="order.status == 'active' " class="btn btn-warning btn-sm ms-3"
+          <button *ngIf="order.status == 'active'" class="btn btn-warning btn-sm ms-3"
             (click)="openPauseModal(pauseModal)">
             {{ order.status === 'active' ? 'Pause' : 'Resume' }}
           </button>
         </div>
-
         <div class="detail-gap"></div>
-
         <div class="detail-label">Customer Name</div>
         <div class="detail-colon">:</div>
         <div class="detail-value">{{ order.user.name }}</div>
-
         <div class="detail-border"></div>
-
         <div class="detail-label">Address</div>
         <div class="detail-colon">:</div>
         <div class="detail-value">{{ order.delevery_address }}</div>
-
         <div class="detail-border"></div>
-
         <div class="detail-label">Email Address</div>
         <div class="detail-colon">:</div>
         <div class="detail-value">{{ order.user.email }}</div>
-
         <div class="detail-border"></div>
-
         <div class="detail-label">Phone Number</div>
         <div class="detail-colon">:</div>
         <div class="detail-value">{{ order.user.phone }}</div>
-
         <div class="detail-border"></div>
-
         <div class="detail-label">Meals Selected</div>
         <div class="detail-colon">:</div>
         <div class="detail-value meal-selection">
@@ -47,33 +38,24 @@
             Breakfast
             <span *ngIf="order.preferences[0]?.lunch || order.preferences[0]?.dinner" class="divider">|</span>
           </span>
-
           <span *ngIf="order.preferences[0]?.lunch" class="meal-item">
             Lunch
             <span *ngIf="order.preferences[0]?.dinner" class="divider">|</span>
           </span>
-
           <span *ngIf="order.preferences[0]?.dinner" class="meal-item">Dinner</span>
         </div>
-
         <div class="detail-border"></div>
-
         <div class="detail-label">Start Date</div>
         <div class="detail-colon">:</div>
         <div class="detail-value">{{ order.start_date | date: 'dd MMM yyyy' }}</div>
-
         <div class="detail-label">End Date</div>
         <div class="detail-colon">:</div>
         <div class="detail-value">{{ order.end_date | date: 'dd MMM yyyy' }}</div>
-
         <div class="detail-border"></div>
-
         <div class="detail-label">Amount</div>
         <div class="detail-colon">:</div>
         <div class="detail-value">₹{{ order.amount }}</div>
-
         <div class="detail-border"></div>
-
         <div class="detail-label">Remarks</div>
         <div class="detail-colon">:</div>
         <div class="detail-value">{{ order.remarks }}</div>
@@ -90,11 +72,10 @@
         </ul>
       </div>
     </div>
-
   </div>
-
 </div>
 
+<!-- MODAL FOR PAUSE FUNCTIONALITY -->
 <ng-template #pauseModal let-modal>
   <div class="modal-header">
     <h5 class="modal-title fw-bold text-danger">Pause Order</h5>
@@ -111,9 +92,12 @@
         <span class="fw-bold">{{ order?.start_date | date: 'dd MMM yyyy' }}</span> –
         <span class="fw-bold">{{ order?.end_date | date: 'dd MMM yyyy' }}</span>
       </p>
-
       <div class="border rounded p-2">
-        <ngb-datepicker [dayTemplate]="customDay" outsideDays="hidden"></ngb-datepicker>
+        <ngb-datepicker
+          [dayTemplate]="customDay"
+          [markDisabled]="markDisabled"
+          outsideDays="hidden"
+        ></ngb-datepicker>
       </div>
     </div>
 
@@ -137,9 +121,17 @@
   </div>
 </ng-template>
 
-<ng-template #customDay let-date let-currentMonth="currentMonth" let-selected="selected">
-  <span class="custom-day" [class.bg-danger]="isDateSelected(date)" [class.disabled-date]="!isDateInRange(date)"
-    (click)="isDateInRange(date) && toggleDate(date)">
+<!-- CUSTOM DAY TEMPLATE: disables, highlights pause, and handles click -->
+<ng-template #customDay let-date let-currentMonth="currentMonth" let-selected="selected" let-disabled="disabled">
+  <span
+    class="custom-day"
+    [class.bg-danger]="isDateSelected(date) && !isDateAlreadyPaused(date)"
+    [class.bg-warning]="isDateAlreadyPaused(date)"
+    [class.text-white]="isDateSelected(date) || isDateAlreadyPaused(date)"
+    [class.disabled-date]="disabled"
+    [class.outside]="date.month !== currentMonth"
+    [attr.title]="isDateAlreadyPaused(date) ? 'Already paused' : ''"
+    (click)="!disabled && toggleDate(date)">
     {{ date.day }}
   </span>
 </ng-template>
