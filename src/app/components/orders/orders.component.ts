@@ -287,44 +287,45 @@ export class OrdersComponent implements OnInit {
     this.modalService.open(content, { size: 'lg' });
   }
 
-  editOrder(order: any, content: any) {
-    this.selectedOrder = order;
+editOrder(order: any, content: any) {
+  this.selectedOrder = order;
 
-    const formattedRecurringDays = (order.recurring_days || []).map((day: string) => {
-      return day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
-    });
+  const formattedRecurringDays = (order.recurring_days || []).map((day: string) => {
+    return day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+  });
 
-    this.orderForm.patchValue({
-      customerName: order.name,
-      email: order.email,
-      customerAddress: order.address,
-      deliveryAddress: order.delivery_address,
-      contactNumber: order.phone,
-      mealTypeId: order.meal_type_id,
-      startDate: this.parseDate(order.start_date),
-      endDate: this.parseDate(order.end_date),
-      deliveryPartner: order.delivery_assignments[0].delivery_partner_id,
-      recurringDays: formattedRecurringDays || [],
-      mealPreferences: {
-        breakfast: order.meal_preferences?.breakfast || false,
-        lunch: order.meal_preferences?.lunch || false,
-        dinner: order.meal_preferences?.dinner || false
-      },
-      remarks: order.remarks
-    });
+  this.orderForm.patchValue({
+    customerName: order.name,
+    email: order.email,
+    customerAddress: order.address,
+    deliveryAddress: order.delivery_address,
+    locationUrl: order.location_url, // ADD THIS LINE
+    contactNumber: order.phone,
+    mealTypeId: order.meal_type_id,
+    startDate: this.parseDate(order.start_date),
+    endDate: this.parseDate(order.end_date),
+    deliveryPartner: order.delivery_assignments[0].delivery_partner_id,
+    recurringDays: formattedRecurringDays || [],
+    mealPreferences: {
+      breakfast: order.meal_preferences?.breakfast || false,
+      lunch: order.meal_preferences?.lunch || false,
+      dinner: order.meal_preferences?.dinner || false
+    },
+    remarks: order.remarks
+  });
 
-    this.orderForm.get('customerName')?.disable();
-    this.orderForm.get('email')?.disable();
-    this.orderForm.get('mealTypeId')?.disable();
-    this.orderForm.get('startDate')?.disable();
-    this.orderForm.get('endDate')?.disable();
-    this.orderForm.get('mealPreferences')?.disable();
-    this.orderForm.get('recurringDays')?.disable();
+  this.orderForm.get('customerName')?.disable();
+  this.orderForm.get('email')?.disable();
+  this.orderForm.get('mealTypeId')?.disable();
+  this.orderForm.get('startDate')?.disable();
+  this.orderForm.get('endDate')?.disable();
+  this.orderForm.get('mealPreferences')?.disable();
+  this.orderForm.get('recurringDays')?.disable();
 
-    this.calculatePayableAmount();
+  this.calculatePayableAmount();
 
-    this.modalService.open(content, { size: 'lg' });
-  }
+  this.modalService.open(content, { size: 'lg' });
+}
 
   parseDate(dateStr: string): NgbDateStruct {
     const date = new Date(dateStr);
@@ -337,10 +338,11 @@ export class OrdersComponent implements OnInit {
 
   updateOrder() {
     if (this.orderForm.valid && this.selectedOrder) {
-      const value = this.orderForm.value;
+      const value = this.orderForm.getRawValue();
       const payload = {
         address: value.customerAddress,
         delivery_address: value.deliveryAddress,
+        location_url: value.locationUrl,
         phone: value.contactNumber,
         delivery_partner_id: value.deliveryPartner,
         remarks: value.remarks
@@ -437,6 +439,34 @@ export class OrdersComponent implements OnInit {
             this.alertService.showAlert({
               message: err.error.message,
               type: 'success',
+              autoDismiss: true,
+              duration: 4000
+            });
+          }
+        });
+      }
+    });
+  }
+
+  deleteOrder(order: any): void {
+    const confirmationText = `Are you sure you want to delete order ${order.order_id}? This action cannot be undone.`;
+
+    this.confirmationService.confirm(confirmationText).then(confirmed => {
+      if(confirmed) {
+        this.service.deleteOrder(order.id).subscribe({
+          next: () => {
+            this.alertService.showAlert({
+              message: `Order deleted successfully`,
+              type: 'success',
+              autoDismiss: true,
+              duration: 3000
+            });
+            this.loadOrderList();
+          },
+          error: (err) => {
+            this.alertService.showAlert({
+              message: err.error.message || `Failed to delete order`,
+              type: `error`,
               autoDismiss: true,
               duration: 4000
             });

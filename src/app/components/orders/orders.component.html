@@ -96,8 +96,14 @@
                             role="button" [title]="order.status === 'active' ? 'Pause Order' : 'Resume Order'"
                             (click)="toggleOrderStatus(order)">
                         </i>
-                         <i class="bi bi-trash3 delete-icon" role="button" title="Delete Order"
-                            ></i>
+
+    <!-- Delete Order                     -->
+     
+                         <i class="bi bi-trash3 delete-icon" 
+                            role="button"
+                            title="Delete Order" 
+                            (click)="deleteOrder(order)">
+                         </i>
                     </td>
                 </tr>
             </tbody>

@@ -74,4 +74,8 @@ export class OrdersService {
     return this.http.patch(`${this.OrderDetailUrl}/${id}/pause-days`, itm)
   }
 
+  deleteOrder(orderId: string) {
+    return this.http.delete(`${this.OrderUrl}/delete-order/${orderId}`)
+  }
+
 }
