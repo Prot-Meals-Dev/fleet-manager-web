@@ -61,9 +61,7 @@
                     <th>Name</th>
                     <th>Address</th>
                     <th>Start Date</th>
-                    <!-- <th>Delivering Today</th> -->
                     <th>Meal Type</th>
-                    <!-- <th>Payment Status</th> -->
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -74,36 +72,55 @@
                     <td (click)="goToOrderDetail(order.id)">{{ order.name }}</td>
                     <td (click)="goToOrderDetail(order.id)">{{ order.delivery_address }}</td>
                     <td (click)="goToOrderDetail(order.id)">{{ order.start_date | date: 'dd-MM-yyyy' }}</td>
-                    <!-- <td (click)="goToOrderDetail(order.id)">{{'Maybe'}}</td> -->
                     <td (click)="goToOrderDetail(order.id)">{{ order.meal_type_name }}</td>
-                    <!-- <td>
-                        <span class="badge px-3 py-2"
-                            [ngClass]="order.paymentStatus === 'Paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
-                            {{ order.paymentStatus }}
-                        </span>
-                    </td> -->
                     <td (click)="goToOrderDetail(order.id)">
                         <span class="badge px-3 py-2"
-                            [ngClass]="order.status === 'active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'">
-                            {{ order.status === 'active' ? 'active' : 'paused' }}
+                            [ngClass]="{
+                                'bg-success-subtle text-success': order.computedStatus === 'active',
+                                'bg-secondary-subtle text-secondary': order.computedStatus === 'paused',
+                                'bg-primary-subtle text-primary': order.computedStatus === 'completed',
+                                'bg-info-subtle text-info': order.computedStatus === 'renewed',
+                                'bg-danger-subtle text-danger': order.computedStatus === 'cancelled'
+                            }">
+                            {{ order.computedStatus }}
                         </span>
                     </td>
                     <td class="action-icons">
-                        <i class="bi bi-pencil-square edit-icon" role="button" title="Edit Order"
-                            (click)="editOrder(order, content)"></i>
-                        <i class="bi"
-                            [ngClass]="order.status === 'active' ? 'bi-pause-circle pause-icon' : 'bi-play-circle resume-icon'"
-                            role="button" [title]="order.status === 'active' ? 'Pause Order' : 'Resume Order'"
-                            (click)="toggleOrderStatus(order)">
+                        <i *ngIf="order.computedStatus !== 'completed' && order.computedStatus !== 'renewed' && order.computedStatus !== 'cancelled'" 
+                           class="bi bi-pencil-square edit-icon" 
+                           role="button" 
+                           title="Edit Order"
+                           (click)="editOrder(order, content)"></i>
+                        
+                        <i *ngIf="order.computedStatus !== 'completed' && order.computedStatus !== 'renewed' && order.computedStatus !== 'cancelled'" 
+                           class="bi"
+                           [ngClass]="order.status === 'active' ? 'bi-pause-circle pause-icon' : 'bi-play-circle resume-icon'"
+                           role="button" 
+                           [title]="order.status === 'active' ? 'Pause Order' : 'Resume Order'"
+                           (click)="toggleOrderStatus(order)">
                         </i>
 
-    <!-- Delete Order                     -->
+                
+                        <i *ngIf="order.computedStatus === 'completed'" 
+                           class="bi bi-arrow-clockwise text-success" 
+                           role="button"
+                           title="Renew Order" 
+                           (click)="renewOrder(order, content)">
+                        </i>
+
+                       
+                        <i *ngIf="order.computedStatus === 'renewed'" 
+                           class="bi bi-check-circle-fill text-info" 
+                           role="button"
+                           title="Order Already Renewed"
+                           style="cursor: not-allowed; opacity: 0.6;">
+                        </i>
      
-                         <i class="bi bi-trash3 delete-icon" 
-                            role="button"
-                            title="Delete Order" 
-                            (click)="deleteOrder(order)">
-                         </i>
+                        <i class="bi bi-trash3 delete-icon" 
+                           role="button"
+                           title="Delete Order" 
+                           (click)="deleteOrder(order)">
+                        </i>
                     </td>
                 </tr>
             </tbody>
@@ -117,7 +134,7 @@
 
 <ng-template #content let-modal>
     <div class="modal-header">
-        <h5 class="modal-title">{{ selectedOrder ? 'Edit Order' : 'Create Order' }}</h5>
+        <h5 class="modal-title">{{ isRenewalMode ? 'Renew Order' : (selectedOrder ? 'Edit Order' : 'Create Order') }}</h5>
         <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
     </div>
 
@@ -205,17 +222,17 @@
                             <button type="button" class="btn" [ngClass]="{
                         'btn-danger': orderForm.get('mealPreferences.breakfast')?.value,
                         'btn-outline-danger': !orderForm.get('mealPreferences.breakfast')?.value
-                      }" (click)="toggleFoodOption('Breakfast')" [disabled]="selectedOrder">Breakfast</button>
+                      }" (click)="toggleFoodOption('Breakfast')" [disabled]="selectedOrder && !isRenewalMode">Breakfast</button>
 
                             <button type="button" class="btn" [ngClass]="{
                         'btn-danger': orderForm.get('mealPreferences.lunch')?.value,
                         'btn-outline-danger': !orderForm.get('mealPreferences.lunch')?.value
-                      }" (click)="toggleFoodOption('Lunch')" [disabled]="selectedOrder">Lunch</button>
+                      }" (click)="toggleFoodOption('Lunch')" [disabled]="selectedOrder && !isRenewalMode">Lunch</button>
 
                             <button type="button" class="btn" [ngClass]="{
                         'btn-danger': orderForm.get('mealPreferences.dinner')?.value,
                         'btn-outline-danger': !orderForm.get('mealPreferences.dinner')?.value
-                      }" (click)="toggleFoodOption('Dinner')" [disabled]="selectedOrder">Dinner</button>
+                      }" (click)="toggleFoodOption('Dinner')" [disabled]="selectedOrder && !isRenewalMode">Dinner</button>
                         </div>
                     </div>
 
@@ -234,7 +251,7 @@
                                 <button type="button" class="btn btn-sm" [ngClass]="{
                                         'btn-outline-secondary': !(orderForm.get('recurringDays')?.value || []).includes(day),
                                         'btn-danger': (orderForm.get('recurringDays')?.value || []).includes(day)
-                                    }" [disabled]="selectedOrder" (click)="toggleRecurringDay(day)">
+                                    }" [disabled]="selectedOrder && !isRenewalMode" (click)="toggleRecurringDay(day)">
                                     {{ day }}
                                 </button>
 
@@ -258,9 +275,8 @@
                 </div>
                 <div class="col-md-6 text-end">
                     <button class="btn btn-primary" type="button" (click)="onSubmitOrder()">
-                        {{ selectedOrder ? 'Update Order' : 'Create Order' }}
+                        {{ isRenewalMode ? 'Renew Order' : (selectedOrder ? 'Update Order' : 'Create Order') }}
                     </button>
-
                 </div>
             </div>
         </form>

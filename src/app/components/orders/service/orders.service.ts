@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environment/environment';
 import { filter } from 'rxjs';
+import { Observable } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root'
@@ -76,6 +78,14 @@ export class OrdersService {
 
   deleteOrder(orderId: string) {
     return this.http.delete(`${this.OrderUrl}/delete-order/${orderId}`)
+  }
+
+  renewOrder(orderId: string, payload: any): Observable<any> {
+  return this.http.patch(`${this.OrderDetailUrl}/${orderId}/renew`, payload);
+  }
+
+   cancelOrder(orderId: string): Observable<any> {
+    return this.http.patch(`${this.OrderDetailUrl}/${orderId}/cancel`, {});
   }
 
 }

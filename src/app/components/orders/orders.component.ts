@@ -34,6 +34,7 @@ export class OrdersComponent implements OnInit {
   today: NgbDateStruct;
   isLoading = false;
   selectedOrder: any = null;
+  isRenewalMode: boolean = false;
   currentPage = 1;
   itemsPerPage = 10;
   totalItems = 0;
@@ -96,10 +97,28 @@ export class OrdersComponent implements OnInit {
       this.filters.page = 1;
     }
 
-    this.service.getOrdersList(this.filters).subscribe({
+    const params: any = { ...this.filters };
+
+    const filteringCompleted = params.status === 'completed';
+    if (!params.status || params.status === 'completed') {
+      delete params.status;
+    }
+
+    this.service.getOrdersList(params).subscribe({
       next: (res: any) => {
-        this.orderList = res.data.data || [];
-        this.totalItems = res.data.total || 0;
+        let orders = (res.data.data || []).map((order: any) => ({
+          ...order,
+          computedStatus: this.getOrderStatus(order)
+        }));
+
+        if (filteringCompleted) {
+          orders = orders.filter((order: any) => order.computedStatus === 'completed');
+          this.totalItems = orders.length;
+        } else {
+          this.totalItems = res.data.total || 0;
+        }
+
+        this.orderList = orders;
         this.isLoading = false;
       },
       error: (err) => {
@@ -115,6 +134,17 @@ export class OrdersComponent implements OnInit {
     })
   }
 
+  getOrderStatus(order: any): string {
+    const endDate = new Date(order.end_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (endDate < today) {
+      return 'completed';
+    }
+    return order.status;
+  }
+
   onPageChange(event: { page: number; itemsPerPage: number }) {
     if (this.currentPage !== event.page) {
       this.currentPage = event.page;
@@ -124,7 +154,7 @@ export class OrdersComponent implements OnInit {
   }
 
   toggleFoodOption(option: string) {
-    if (this.selectedOrder) return;
+    if (this.selectedOrder && !this.isRenewalMode) return;
 
     const mealPreferences = this.orderForm.get('mealPreferences');
     if (mealPreferences) {
@@ -216,61 +246,285 @@ export class OrdersComponent implements OnInit {
   isDateDisabled = (date: NgbDate, current?: { year: number; month: number }): boolean => {
     const todayDate = new Date(this.today.year, this.today.month - 1, this.today.day);
     const checkDate = new Date(date.year, date.month - 1, date.day);
-    return checkDate <= todayDate; // disables today and earlier
+    return checkDate <= todayDate;
   };
 
+renewOrder(order: any, content: any) {
+  // Prevent renewing already renewed orders
+  // Check the actual status from backend
+  if (order.status === 'renewed' || order.computedStatus === 'renewed') {
+    this.alertService.showAlert({
+      message: 'This order has already been renewed',
+      type: 'warning',
+      autoDismiss: true,
+      duration: 4000
+    });
+    return;
+  }
 
-  submitOrder() {
-    if (this.orderForm.valid) {
-      const value = this.orderForm.value;
+  this.selectedOrder = order;
+  this.isRenewalMode = true;
 
-      const payload = {
-        name: value.customerName,
-        address: value.customerAddress,
-        delivery_address: value.deliveryAddress,
-        location_url: value.locationUrl,
-        phone: value.contactNumber,
-        email: value.email,
-        meal_type_id: value.mealTypeId,
-        start_date: this.formatDate(value.startDate),
-        end_date: this.formatDate(value.endDate),
-        recurring_days: value.recurringDays.map((d: string) => d.toLowerCase()),
-        delivery_partner_id: value.deliveryPartner,
-        meal_preferences: {
-          breakfast: value.mealPreferences.breakfast,
-          lunch: value.mealPreferences.lunch,
-          dinner: value.mealPreferences.dinner
-        },
-        remarks: value.remarks
-      };
-  
+  console.log('Original order data for renewal:', order);
 
-      this.service.createNewOrder(payload).subscribe({
-        next: (res) => {
-          this.alertService.showAlert({
-            message: 'Order Created',
-            type: 'success',
-            autoDismiss: true,
-            duration: 4000
-          });
-          this.loadOrderList();
-          this.orderForm.reset();
-          this.modalService.dismissAll();
-        },
-        error: (err) => {
-          this.alertService.showAlert({
-            message: err.error.message,
-            type: 'error',
-            autoDismiss: true,
-            duration: 4000
-          });
-        }
+  const formattedRecurringDays = (order.recurring_days || []).map((day: string) => {
+    return day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+  });
+
+  const deliveryPartnerId = order.delivery_assignments?.length > 0 
+    ? order.delivery_assignments[0].delivery_partner_id 
+    : '';
+
+  this.orderForm.patchValue({
+    customerName: order.name,
+    email: order.email,
+    customerAddress: order.address,
+    deliveryAddress: order.delivery_address,
+    locationUrl: order.location_url,
+    contactNumber: order.phone,
+    mealTypeId: order.meal_type_id,
+    startDate: null, 
+    endDate: null,   
+    deliveryPartner: deliveryPartnerId,
+    recurringDays: formattedRecurringDays || [],
+    mealPreferences: {
+      breakfast: order.meal_preferences?.breakfast || false,
+      lunch: order.meal_preferences?.lunch || false,
+      dinner: order.meal_preferences?.dinner || false
+    },
+    remarks: order.remarks || ''
+  });
+
+
+  this.orderForm.get('customerName')?.enable();
+  this.orderForm.get('email')?.enable();
+  this.orderForm.get('mealTypeId')?.enable();
+  this.orderForm.get('startDate')?.enable();
+  this.orderForm.get('endDate')?.enable();
+  this.orderForm.get('mealPreferences')?.enable();
+  this.orderForm.get('recurringDays')?.enable();
+
+  this.modalService.open(content, { size: 'lg' });
+}
+
+submitOrder() {
+  // Validate form first
+  if (!this.orderForm.valid) {
+    console.error('Form is invalid:', this.orderForm.errors);
+    this.alertService.showAlert({
+      message: 'Please fill all required fields',
+      type: 'error',
+      autoDismiss: true,
+      duration: 4000
+    });
+    return;
+  }
+
+  const value = this.orderForm.getRawValue();
+  console.log('Form raw value:', value);
+
+  // Additional validation for renewal mode
+  if (this.isRenewalMode) {
+    if (!value.startDate || !value.endDate) {
+      this.alertService.showAlert({
+        message: 'Please select start and end dates for renewal',
+        type: 'error',
+        autoDismiss: true,
+        duration: 4000
       });
+      return;
+    }
+
+    if (!value.recurringDays || value.recurringDays.length === 0) {
+      this.alertService.showAlert({
+        message: 'Please select at least one recurring day',
+        type: 'error',
+        autoDismiss: true,
+        duration: 4000
+      });
+      return;
+    }
+
+    if (!value.mealPreferences.breakfast && !value.mealPreferences.lunch && !value.mealPreferences.dinner) {
+      this.alertService.showAlert({
+        message: 'Please select at least one meal preference',
+        type: 'error',
+        autoDismiss: true,
+        duration: 4000
+      });
+      return;
+    }
+
+    if (!this.selectedOrder) {
+      this.alertService.showAlert({
+        message: 'No order selected for renewal',
+        type: 'error',
+        autoDismiss: true,
+        duration: 4000
+      });
+      return;
     }
   }
 
+  // If renewal mode, use two-step process: create new order, then mark old as renewed
+  if (this.isRenewalMode && this.selectedOrder) {
+    const newOrderPayload = {
+      name: value.customerName,
+      address: value.customerAddress,
+      delivery_address: value.deliveryAddress,
+      location_url: value.locationUrl || '',
+      phone: value.contactNumber,
+      email: value.email,
+      meal_type_id: value.mealTypeId,
+      start_date: this.formatDate(value.startDate),
+      end_date: this.formatDate(value.endDate),
+      recurring_days: value.recurringDays.map((d: string) => d.toLowerCase()),
+      delivery_partner_id: value.deliveryPartner,
+      meal_preferences: {
+        breakfast: value.mealPreferences.breakfast,
+        lunch: value.mealPreferences.lunch,
+        dinner: value.mealPreferences.dinner
+      },
+      remarks: value.remarks || ''
+    };
+
+    // console.log('=== RENEWAL PROCESS START ===');
+    // console.log('Step 1: Creating new order with payload:', JSON.stringify(newOrderPayload, null, 2));
+
+    this.service.createNewOrder(newOrderPayload).subscribe({
+      next: (res: any) => {
+        console.log('Step 1 SUCCESS: New order created:', res);
+        console.log('Step 2: Marking old order as renewed. Order ID:', this.selectedOrder.id);
+
+        this.service.renewOrder(this.selectedOrder.id, {}).subscribe({
+          next: (renewRes: any) => {
+            // console.log('Step 2 SUCCESS: Old order marked as renewed:', renewRes);
+            // console.log('=== RENEWAL PROCESS COMPLETE ===');
+
+            this.alertService.showAlert({
+              message: 'Order Renewed Successfully',
+              type: 'success',
+              autoDismiss: true,
+              duration: 4000
+            });
+            
+            // Reload the list to show updated renewed status
+            this.loadOrderList();
+            this.orderForm.reset();
+            this.isRenewalMode = false;
+            this.selectedOrder = null;
+            this.payableAmount = 0;
+            this.modalService.dismissAll();
+          },
+          error: (renewErr) => {
+            console.error('Step 2 FAILED: Could not mark old order as renewed');
+            console.error('Full error object:', renewErr);
+            console.error('Error status:', renewErr.status);
+            console.error('Error statusText:', renewErr.statusText);
+            console.error('Error body:', renewErr.error);
+            console.error('Error message:', renewErr.error?.message || renewErr.message);
+            
+            if (renewErr.error) {
+              console.error('Detailed error:', JSON.stringify(renewErr.error, null, 2));
+            }
+            
+            // console.error('Request URL:', renewErr.url);
+            // console.error('=== RENEWAL PROCESS INCOMPLETE ===');
+            // console.warn('Note: New order was created successfully, but old order could not be marked as renewed');
+
+            // New order was created, but marking as renewed failed
+            // Still show success since the new order exists
+            let warningMessage = 'New order created successfully, but there was an issue marking the old order as renewed.';
+            
+            if (renewErr.error?.message) {
+              warningMessage += ` Error: ${renewErr.error.message}`;
+            }
+            
+            this.alertService.showAlert({
+              message: warningMessage,
+              type: 'warning',
+              autoDismiss: true,
+              duration: 8000
+            });
+            this.loadOrderList();
+            this.orderForm.reset();
+            this.isRenewalMode = false;
+            this.selectedOrder = null;
+            this.payableAmount = 0;
+            this.modalService.dismissAll();
+          }
+        });
+      },
+      error: (err) => {
+        // console.error('Step 1 FAILED: Could not create new order:', err);
+        // console.error('Error body:', JSON.stringify(err.error, null, 2));
+        // console.error('=== RENEWAL PROCESS FAILED ===');
+
+        this.alertService.showAlert({
+          message: err.error?.message || 'Failed to create renewal order',
+          type: 'error',
+          autoDismiss: true,
+          duration: 4000
+        });
+      }
+    });
+    return;
+  }
+
+  // Create new order flow (non-renewal)
+  const payload: any = {
+    name: value.customerName,
+    address: value.customerAddress,
+    delivery_address: value.deliveryAddress,
+    location_url: value.locationUrl || '',
+    phone: value.contactNumber,
+    email: value.email,
+    meal_type_id: value.mealTypeId,
+    start_date: this.formatDate(value.startDate),
+    end_date: this.formatDate(value.endDate),
+    recurring_days: value.recurringDays.map((d: string) => d.toLowerCase()),
+    delivery_partner_id: value.deliveryPartner,
+    meal_preferences: {
+      breakfast: value.mealPreferences.breakfast,
+      lunch: value.mealPreferences.lunch,
+      dinner: value.mealPreferences.dinner
+    },
+    remarks: value.remarks || ''
+  };
+
+  // console.log('Create order payload:', JSON.stringify(payload, null, 2));
+
+  this.service.createNewOrder(payload).subscribe({
+    next: (res) => {
+      this.alertService.showAlert({
+        message: 'Order Created',
+        type: 'success',
+        autoDismiss: true,
+        duration: 4000
+      });
+      this.loadOrderList();
+      this.orderForm.reset();
+      this.isRenewalMode = false;
+      this.payableAmount = 0;
+      this.modalService.dismissAll();
+    },
+    error: (err) => {
+      // console.error('Create order error:', err);
+      // console.error('Error body:', JSON.stringify(err.error, null, 2));
+      this.alertService.showAlert({
+        message: err.error?.message || 'Failed to create order',
+        type: 'error',
+        autoDismiss: true,
+        duration: 4000
+      });
+    }
+  });
+}
+
   onSubmitOrder() {
-    if (this.selectedOrder) {
+    if (this.isRenewalMode) {
+      this.submitOrder();
+    } else if (this.selectedOrder) {
       this.updateOrder();
     } else {
       this.submitOrder();
@@ -282,50 +536,54 @@ export class OrdersComponent implements OnInit {
     buttonElement.blur();
 
     this.selectedOrder = null;
+    this.isRenewalMode = false;
     this.initForm();
 
     this.modalService.open(content, { size: 'lg' });
   }
 
-editOrder(order: any, content: any) {
-  this.selectedOrder = order;
+  editOrder(order: any, content: any) {
+    this.selectedOrder = order;
+    this.isRenewalMode = false;
 
-  const formattedRecurringDays = (order.recurring_days || []).map((day: string) => {
-    return day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
-  });
+    const formattedRecurringDays = (order.recurring_days || []).map((day: string) => {
+      return day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+    });
 
-  this.orderForm.patchValue({
-    customerName: order.name,
-    email: order.email,
-    customerAddress: order.address,
-    deliveryAddress: order.delivery_address,
-    locationUrl: order.location_url, // ADD THIS LINE
-    contactNumber: order.phone,
-    mealTypeId: order.meal_type_id,
-    startDate: this.parseDate(order.start_date),
-    endDate: this.parseDate(order.end_date),
-    deliveryPartner: order.delivery_assignments[0].delivery_partner_id,
-    recurringDays: formattedRecurringDays || [],
-    mealPreferences: {
-      breakfast: order.meal_preferences?.breakfast || false,
-      lunch: order.meal_preferences?.lunch || false,
-      dinner: order.meal_preferences?.dinner || false
-    },
-    remarks: order.remarks
-  });
+    this.orderForm.patchValue({
+      customerName: order.name,
+      email: order.email,
+      customerAddress: order.address,
+      deliveryAddress: order.delivery_address,
+      locationUrl: order.location_url,
+      contactNumber: order.phone,
+      mealTypeId: order.meal_type_id,
+      startDate: this.parseDate(order.start_date),
+      endDate: this.parseDate(order.end_date),
+      deliveryPartner: order.delivery_assignments[0].delivery_partner_id,
+      recurringDays: formattedRecurringDays || [],
+      mealPreferences: {
+        breakfast: order.meal_preferences?.breakfast || false,
+        lunch: order.meal_preferences?.lunch || false,
+        dinner: order.meal_preferences?.dinner || false
+      },
+      remarks: order.remarks
+    });
 
-  this.orderForm.get('customerName')?.disable();
-  this.orderForm.get('email')?.disable();
-  this.orderForm.get('mealTypeId')?.disable();
-  this.orderForm.get('startDate')?.disable();
-  this.orderForm.get('endDate')?.disable();
-  this.orderForm.get('mealPreferences')?.disable();
-  this.orderForm.get('recurringDays')?.disable();
+    this.orderForm.get('customerName')?.disable();
+    this.orderForm.get('email')?.disable();
+    this.orderForm.get('mealTypeId')?.disable();
+    this.orderForm.get('startDate')?.disable();
+    this.orderForm.get('endDate')?.disable();
+    this.orderForm.get('mealPreferences')?.disable();
+    this.orderForm.get('recurringDays')?.disable();
 
-  this.calculatePayableAmount();
+    this.calculatePayableAmount();
 
-  this.modalService.open(content, { size: 'lg' });
-}
+    this.modalService.open(content, { size: 'lg' });
+  }
+
+
 
   parseDate(dateStr: string): NgbDateStruct {
     const date = new Date(dateStr);
@@ -417,6 +675,11 @@ editOrder(order: any, content: any) {
   }
 
   toggleOrderStatus(order: any): void {
+    // Don't allow toggling completed orders
+    if (order.computedStatus === 'completed') {
+      return;
+    }
+
     const isCurrentlyActive = order.status === 'active';
     const newStatus = isCurrentlyActive ? 'paused' : 'active';
     const confirmationText = `Are you sure you want to ${isCurrentlyActive ? 'pause' : 'resume'} this order?`;
@@ -427,7 +690,7 @@ editOrder(order: any, content: any) {
           next: () => {
             order.status = newStatus;
             this.alertService.showAlert({
-              message: 'Order Paused',
+              message: `Order ${isCurrentlyActive ? 'Paused' : 'Resumed'}`,
               type: 'success',
               autoDismiss: true,
               duration: 4000
@@ -438,7 +701,7 @@ editOrder(order: any, content: any) {
             console.error('Failed to update order status:', err);
             this.alertService.showAlert({
               message: err.error.message,
-              type: 'success',
+              type: 'error',
               autoDismiss: true,
               duration: 4000
             });
@@ -475,4 +738,4 @@ editOrder(order: any, content: any) {
       }
     });
   }
-}
+}  

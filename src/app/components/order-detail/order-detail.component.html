@@ -9,10 +9,17 @@
         <div class="detail-colon">:</div>
         <div class="detail-value d-flex justify-content-between align-items-center">
           {{ order.order_id }}
-          <button *ngIf="order.status == 'active'" class="btn btn-warning btn-sm ms-3"
-            (click)="openPauseModal(pauseModal)">
-            {{ order.status === 'active' ? 'Pause' : 'Resume' }}
-          </button>
+          <div *ngIf="order.status !== 'cancelled' && order.status !== 'completed'">
+            <button *ngIf="order.status == 'active'" class="btn btn-warning btn-sm ms-3"
+              (click)="openPauseModal(pauseModal)">
+              Pause
+            </button>
+            <button class="btn btn-danger btn-sm ms-2" (click)="cancelOrder()">
+              Cancel Order
+            </button>
+          </div>
+          <span *ngIf="order.status === 'cancelled'" class="badge bg-danger ms-3">Cancelled</span>
+          <span *ngIf="order.status === 'completed'" class="badge bg-success ms-3">Completed</span>
         </div>
         <div class="detail-gap"></div>
         <div class="detail-label">Customer Name</div>
