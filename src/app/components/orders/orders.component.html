@@ -85,7 +85,8 @@
                             {{ order.computedStatus }}
                         </span>
                     </td>
-                    <td class="action-icons">
+                    <td>
+                    <div class="action-icons">
                         <i *ngIf="order.computedStatus !== 'completed' && order.computedStatus !== 'renewed' && order.computedStatus !== 'cancelled'" 
                            class="bi bi-pencil-square edit-icon" 
                            role="button" 
@@ -121,6 +122,7 @@
                            title="Delete Order" 
                            (click)="deleteOrder(order)">
                         </i>
+                    </div>
                     </td>
                 </tr>
             </tbody>

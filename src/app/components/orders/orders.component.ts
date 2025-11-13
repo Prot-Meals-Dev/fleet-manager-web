@@ -136,10 +136,11 @@ export class OrdersComponent implements OnInit {
 
   getOrderStatus(order: any): string {
     const endDate = new Date(order.end_date);
+    endDate.setHours(0,0,0,0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
-    if (endDate < today) {
+
+    if (endDate <= today) {
       return 'completed';
     }
     return order.status;
@@ -243,11 +244,23 @@ export class OrdersComponent implements OnInit {
     this.calculatePayableAmount();
   }
 
-  isDateDisabled = (date: NgbDate, current?: { year: number; month: number }): boolean => {
-    const todayDate = new Date(this.today.year, this.today.month - 1, this.today.day);
-    const checkDate = new Date(date.year, date.month - 1, date.day);
-    return checkDate <= todayDate;
-  };
+isDateDisabled = (date: NgbDate): boolean => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const check = new Date(date.year, date.month - 1, date.day);
+  check.setHours(0, 0, 0, 0);
+
+  // NORMAL CREATE ORDER → same as before (today disabled)
+  if (!this.isRenewalMode) {
+    return check <= today;
+  }
+
+  // RENEWAL MODE ONLY:
+  // Today is allowed, yesterday is not
+  return check < today;
+};
+
 
 renewOrder(order: any, content: any) {
   // Prevent renewing already renewed orders
