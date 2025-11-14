@@ -167,38 +167,9 @@ button.btn-danger:hover {
   border-radius: 50%;
 }
 
-/* Optional: Add a legend in your modal */
-/* .date-legend {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
+.detail-value a {
+    text-decoration: none;
 }
-
-.date-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.date-legend-box {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-} */
-
-/* .legend-selected {
-  background-color: #dc3545;
-}
-
-.legend-paused {
-  background-color: #ffc107;
-}
-
-.legend-disabled {
-  background-color: #f8f9fa;
-  border: 1px solid #ccc;
-} */
 
 @media (max-width: 768px) {
     .detail-container {

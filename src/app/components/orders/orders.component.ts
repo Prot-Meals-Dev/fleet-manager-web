@@ -251,14 +251,13 @@ isDateDisabled = (date: NgbDate): boolean => {
   const check = new Date(date.year, date.month - 1, date.day);
   check.setHours(0, 0, 0, 0);
 
-  // NORMAL CREATE ORDER → same as before (today disabled)
-  if (!this.isRenewalMode) {
-    return check <= today;
-  }
+  // if (!this.isRenewalMode) {
+  //   return check <= today;
+  // }
 
   // RENEWAL MODE ONLY:
   // Today is allowed, yesterday is not
-  return check < today;
+  return check <= today;
 };
 
 
