@@ -102,7 +102,7 @@
                         </i>
 
                 
-                        <i *ngIf="order.computedStatus === 'completed'" 
+                        <i *ngIf="order.computedStatus === 'completed' && order.status !== 'cancelled' && order.status !== 'renewed'" 
                            class="bi bi-arrow-clockwise text-success" 
                            role="button"
                            title="Renew Order" 

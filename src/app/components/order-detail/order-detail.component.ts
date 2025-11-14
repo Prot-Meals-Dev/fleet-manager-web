@@ -149,6 +149,27 @@ export class OrderDetailComponent implements OnInit {
    * Cancel Order with Confirmation
    */
   cancelOrder(): void {
+
+    if (this.order.status === 'completed') {
+    this.alertService.showAlert({
+      message: 'Cannot cancel a completed order',
+      type: 'warning',
+      autoDismiss: true,
+      duration: 3000
+    });
+    return;
+  }
+
+  if (this.order.status === 'cancelled') {
+    this.alertService.showAlert({
+      message: 'This order is already cancelled',
+      type: 'warning',
+      autoDismiss: true,
+      duration: 3000
+    });
+    return;
+  }
+
     const confirmationText = `Are you sure you want to cancel order ${this.order.order_id}? This action cannot be undone and the order will be marked as cancelled.`;
 
     this.confirmationService.confirm(confirmationText).then(confirmed => {

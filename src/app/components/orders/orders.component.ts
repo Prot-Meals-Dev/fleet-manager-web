@@ -263,6 +263,16 @@ isDateDisabled = (date: NgbDate): boolean => {
 
 
 renewOrder(order: any, content: any) {
+
+    if (order.status === 'cancelled') {
+    this.alertService.showAlert({
+      message: 'Cannot renew a cancelled order',
+      type: 'warning',
+      autoDismiss: true,
+      duration: 4000
+    });
+    return;
+  }
   // Prevent renewing already renewed orders
   // Check the actual status from backend
   if (order.status === 'renewed' || order.computedStatus === 'renewed') {
@@ -274,6 +284,16 @@ renewOrder(order: any, content: any) {
     });
     return;
   }
+
+  //   if (order.status === 'active' || order.computedStatus === 'active') {
+  //   this.alertService.showAlert({
+  //     message: 'Cannot renew an active order. Please wait until the order is completed.',
+  //     type: 'warning',
+  //     autoDismiss: true,
+  //     duration: 4000
+  //   });
+  //   return;
+  // }
 
   this.selectedOrder = order;
   this.isRenewalMode = true;
